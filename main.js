@@ -32,7 +32,7 @@ var job = function() {
 }
 
 var rule = new schedule.RecurrenceRule();
-rule.hour = [9, 18];
+rule.hour = [8, 12, 20];
 rule.minute = 0;
 schedule.scheduleJob(rule, job);
 
