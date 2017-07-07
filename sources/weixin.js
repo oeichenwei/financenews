@@ -4,6 +4,7 @@
   var util = require("../utils.js")
   var Q = require('q');
   var StockNewsDB = require("../stocknewsdb.js")
+  var fs = require("fs");
 
   function SearchAccount(cacheFolder, id) {
       let url = "http://weixin.sogou.com/weixin?type=1&s_from=input&ie=utf8&_sug_=n&_sug_type_=&query=" + id
@@ -30,6 +31,11 @@
         }
       }
       var retList = []
+      if (!msgList) {
+        fs.unlinkSync(listPath);
+        return new Error(url);
+      }
+
       for (var i = 0; i < msgList.list.length; i++) {
         var basicItem = msgList.list[i]["app_msg_ext_info"]
         basicItem["comm_msg_info"] = msgList.list[i]["comm_msg_info"]
@@ -47,7 +53,7 @@
     })
   }
 
-  function SaveWeixinArticle(article, id) {
+  function SaveWeixinArticle(article, id, db) {
     var url;
     if (article["content_url"].indexOf("http://") >= 0) {
       url = article["content_url"].replace(/&amp;/gi,"&");
@@ -57,21 +63,28 @@
     let cacheArticlePath = path.join("caches", "weixin", id + "_" + article["fileid"] + "_" + article["comm_msg_info"]["id"] + ".html")
     return util.downloadUrlWeixin(url, cacheArticlePath).then(util.parseHTML).then(function(window) {
       let content =  window.$("div[id='js_content']").html();
-      //console.log(content)
       article["content"] = content
       article["recvDate"] = article["comm_msg_info"]["datetime"] * 1000
       article["sourceId"] = id
       article["uri"] = url
-      return article
+      //console.log(article)
+
+      return db.saveDoc(article)
     })
   }
 
-  function DownloadWeixinArticle(articles, id) {
-    var tasks = [];
-    for (var key in articles) {
-      tasks.push(SaveWeixinArticle(articles[key], id));
+  function DownloadWeixinArticle(articles, id, db) {
+    if (articles instanceof Error) {
+      var deferred = Q.defer();
+      deferred.reject(articles);
+      return deferred.promise;
     }
-    return Q.all(tasks);
+
+    var result = Q();
+    articles.forEach(function (article) {
+      result = result.then(() => SaveWeixinArticle(article, id, db));
+    });
+    return result;
   }
 
   function WeixinSource(db, cacheFolder, id) {
@@ -81,14 +94,8 @@
     return db.getLastUpdatedDate(id).then((lastdate) => {
       _lastdate = lastdate;
       return SearchAccount(cacheFolder, id).then((url) => ListRecentArticles(url, cacheFolder, id))
-                .then((articles) => DownloadWeixinArticle(articles, id))
-                .then(function(articles) {
-                    for (var index in articles) {
-                      db.saveDoc(articles[index]);
-                      //console.log(articles[index]["uri"])
-                    }
-                    return "done"
-                })
+                .then((articles) => DownloadWeixinArticle(articles, id, db))
+                .then((result) => {return "done";})
     });
   }
 

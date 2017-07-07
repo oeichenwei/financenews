@@ -1,7 +1,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>最新金融资讯</title>
+  <title>金融资讯更新状况</title>
   <link href="static/styles.css" rel="stylesheet" type="text/css" />
   <script type='text/javascript' src="static/jquery.min.js"></script>
   <meta name="viewport" content="width=device-width" />
@@ -9,14 +9,35 @@
 <body>
   <div class="container">
     <div class="blog-header">
-        <h1 class="blog-title">最新金融资讯</h1>
-        <p class="lead blog-description">自动整理自Wallstreet和部分公众号</p>
-    </div>
-    <div class="row">
-        <div class="blog-main" id="articles">
-        </div><!-- /.blog-main -->
+        <h1 class="blog-title">资讯分类</h1>
+        <ul>
+          <li><a href="articles.html?sourceId=general">金融经济咨讯</a></li>
+          <li><a href="articles.html?sourceId=future">行业咨讯</a></li>
+        </ul>
+        <h1 class="blog-title">最近一次更新状态：</h1>
+        <p id="status"></p>
+        <ul id="sources_status">
+        </ul>
     </div>
   </div>
+  <script>
+  $.ajax({
+    url: "/status",
+    data: {},
+    dataType: "json",
+    success: function(data) {
+      var updateDate = new Date(data["date"]);
+      updateDate = updateDate.toLocaleDateString() + updateDate.toLocaleTimeString();
+      var resultStr = " 成功";
+      if (!data["result"]) {
+        resultStr = "失败";
+        resultStr += " <a href='/proxy?url=" + encodeURI(data["verify"]) + "' target='_blank'>点击输入验证码</a>";
+      }
+
+      $("#status").html(updateDate + " 更新 " + resultStr);
+      console.log(updateDate, data);
+    }
+  });
+  </script>
 </body>
-<script type='text/javascript' src="static/list_articles.js"></script>
 </html>

@@ -42,6 +42,16 @@
     return result;
   }
 
+  function successJob(result) {
+    util.lastRun = {date: (new Date()).getTime(), result: true};
+    console.log(result);
+  }
+
+  function failedJob(err) {
+    util.lastRun = {date: (new Date()).getTime(), result: false, verify: err.message};
+    console.error(err);
+  }
+
   FinanceNewsCrawl.prototype.run = function(theDate) {
     if (!theDate) {
       theDate = new Date();
@@ -53,7 +63,7 @@
     this.db.createIndex()
         .then(() => WallStreetSource(_this.db, _this.cacheFolder))
         .then(() => _this.AllWeixinAccounts())
-        .then(console.log, console.error);
+        .then(successJob, failedJob);
   }
   if (typeof window !== 'undefined') {
     window.FinanceNewsCrawl = FinanceNewsCrawl;

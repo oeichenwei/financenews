@@ -6,7 +6,8 @@
   var db = new StockNewsDB()
   var session = require('express-session');
   var bodyParser = require('body-parser');
-
+  var util = require("./utils.js")
+  
   app.use(bodyParser.urlencoded({extended: true}));
   app.use(bodyParser.json());
   app.use(session({secret: 'Pa$$lhm20170625',
@@ -54,6 +55,10 @@
       res.end('done');
     }
     res.end("Login Failure");
+  });
+
+  app.get('/status', function (req, res) {
+    res.send(util.lastRun);
   });
 
   function WebRender() {

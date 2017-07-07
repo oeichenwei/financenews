@@ -76,6 +76,11 @@
 
   CrawlUtil.downloadUrlWeixin = function(url, filepath) {
     var deferred = Q.defer();
+    if (fs.existsSync(filepath)) {
+      deferred.resolve(fs.readFileSync(filepath, "utf-8"));
+      return deferred.promise;
+    }
+
     setTimeout(function(){
       CrawlUtil.downloadUrlCallback(url, filepath, false, function(err, result) {
         if (err) {

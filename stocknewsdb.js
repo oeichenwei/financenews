@@ -42,6 +42,7 @@
         return;
       }
       var collection = db.collection('articles');
+      //console.info("saveDoc");
       if (util.isGeneral(doc["sourceId"])) {
         doc["category"] = "general";
       } else {
