@@ -10,6 +10,13 @@
   var CrawlUtil = {
   }
 
+  CrawlUtil.isGeneral = function(sourceId) {
+    var generalSources = ["wallstreet", "cn-finance", "haiqing_FICC", "jrhycom",
+          "cebmmacro",  "CEBM_research", "zepinghongguan", "CHINAFINANCE40FORUM",
+          "cfn-china", "FN_FinancialNews"];
+    return generalSources.includes(sourceId);
+  }
+
   CrawlUtil.mkdirSync = function(path) {
     try {
       fs.mkdirSync(path);

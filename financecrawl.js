@@ -31,8 +31,8 @@
 
   FinanceNewsCrawl.prototype.AllWeixinAccounts = function() {
     //海清FICC频道,金融行业网,莫尼塔宏观研究,莫尼塔研究,泽平宏观,中国金融四十人论坛,中国金融网,中国金融新闻网,中国金融杂志
-    var weixinSources = ["cn-finance", "midou888_zx", "haiqing_FICC", "jrhycom", "cebmmacro",
-      "CEBM_research", "zepinghongguan", "CHINAFINANCE40FORUM", "cfn-china", "FN_FinancialNews"];
+    var weixinSources = ["cn-finance", "haiqing_FICC", "jrhycom", "cebmmacro",
+      "CEBM_research", "zepinghongguan", "CHINAFINANCE40FORUM", "cfn-china", "FN_FinancialNews", "midou888_zx"];
 
     var result = Q();
     var _this = this;

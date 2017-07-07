@@ -2,6 +2,7 @@
 (function() {
   var Q = require('q')
   var MongoClient = require('mongodb').MongoClient
+  var util = require("./utils.js")
 
   function StockNewsDB(url) {
     console.log("StockNewsDB new instance, url=", url)
@@ -41,6 +42,12 @@
         return;
       }
       var collection = db.collection('articles');
+      if (util.isGeneral(doc["sourceId"])) {
+        doc["category"] = "general";
+      } else {
+        doc["category"] = "future";
+      }
+
       var key = {recvDate : doc["recvDate"], uri: doc["uri"]}
       let value = Object.assign({}, doc);
       delete value.recvDate
@@ -100,7 +107,7 @@
       }
 
       if (sourceId && sourceId.length > 0) {
-        queryCondition["sourceId"] = sourceId
+        queryCondition["category"] = sourceId
       }
       console.log(queryCondition)
       db.collection('articles').find(queryCondition, {sort: {"recvDate": sortOrder}, limit: count}).toArray(function(err, docs) {
@@ -110,6 +117,33 @@
         }
         db.close();
         deferred.resolve(docs);
+      });
+    });
+    return deferred.promise;
+  }
+
+  StockNewsDB.prototype.updateCategory = function(sourceId) {
+    console.log("updateCategory", sourceId);
+    var deferred = Q.defer();
+    MongoClient.connect(this.dburl, function(err, db) {
+      if (err) {
+        deferred.reject(err);
+        return;
+      }
+      var category = "future";
+      if (util.isGeneral(sourceId)) {
+        category = "general";
+      }
+
+      console.log("updateCategory category=", category);
+      var collection = db.collection('articles');
+      collection.update({"sourceId": sourceId}, {$set: {"category": category}}, {multi: true}, function(err, result) {
+        if (err) {
+          console.error(err, result);
+        }
+        console.log("done for ", sourceId);
+        db.close();
+        deferred.resolve("updated");
       });
     });
     return deferred.promise;
