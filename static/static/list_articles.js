@@ -20,7 +20,7 @@
   function listArticles(date, type, sourceId) {
     $.ajax({
       url: "/query",
-      data: {count: 20, "sourceId": sourceId, "type": type, "date": date}, //cn-finance
+      data: {count: 15, "sourceId": sourceId, "type": type, "date": date}, //cn-finance
       dataType: "json",
       success: function(data) {
         console.log("listArticles success:", data.length)

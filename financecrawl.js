@@ -30,9 +30,14 @@
   }
 
   FinanceNewsCrawl.prototype.AllWeixinAccounts = function() {
-    //海清FICC频道,金融行业网,莫尼塔宏观研究,莫尼塔研究,泽平宏观,中国金融四十人论坛,中国金融网,中国金融新闻网,中国金融杂志
     var weixinSources = ["cn-finance", "haiqing_FICC", "jrhycom", "cebmmacro",
-      "CEBM_research", "zepinghongguan", "CHINAFINANCE40FORUM", "cfn-china", "FN_FinancialNews", "midou888_zx"];
+      "CEBM_research", "zepinghongguan", "CHINAFINANCE40FORUM", "cfn-china", "FN_FinancialNews",
+      "midou888_zx", "qihuozhoukan", "gh_ae0f6dacaf22", "hedgechina", "hexun_futures",
+      "gh_a16e4bca4323", "qhrb168", "elogic", "jydmhg315", "langeweixin", "gh_4a0f4b50dd80",
+      "nhqhscfzb", "nmghgw", "cjshcce", "puoketrader", "ykxj123", "v_breezes",
+      "Wanhua_Petrochemical", "Mysteel-shgl", "erds4888", "ydqhjy", "zsqhyjs",
+      "zslsd_", "cncotton", "CISA_chinaisa", "CCAON-lvjian", "zlqh-yjy", "macrocs",
+      "zhuochuangsteel", "sciplas"];
 
     var result = Q();
     var _this = this;
