@@ -30,14 +30,7 @@
   }
 
   FinanceNewsCrawl.prototype.AllWeixinAccounts = function() {
-    var weixinSources = ["cn-finance", "haiqing_FICC", "jrhycom", "cebmmacro",
-      "CEBM_research", "zepinghongguan", "CHINAFINANCE40FORUM", "cfn-china", "FN_FinancialNews",
-      "midou888_zx", "qihuozhoukan", "gh_ae0f6dacaf22", "hedgechina", "hexun_futures",
-      "gh_a16e4bca4323", "qhrb168", "elogic", "jydmhg315", "langeweixin", "gh_4a0f4b50dd80",
-      "nhqhscfzb", "nmghgw", "cjshcce", "puoketrader", "ykxj123", "v_breezes",
-      "Wanhua_Petrochemical", "Mysteel-shgl", "erds4888", "ydqhjy", "zsqhyjs",
-      "zslsd_", "cncotton", "CISA_chinaisa", "CCAON-lvjian", "zlqh-yjy", "macrocs",
-      "zhuochuangsteel", "sciplas"];
+    var weixinSources = util.getAllWeixinSources();
 
     var result = Q();
     var _this = this;

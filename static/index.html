@@ -43,12 +43,9 @@
       if (data["details"] instanceof Array) {
         var sourceLists = "";
         data["details"].forEach(function(item) {
-          for(var key in item) {
-            var itemDate = new Date(item[key]);
-            itemDate = itemDate.toLocaleDateString() + " " + itemDate.toLocaleTimeString();
-            sourceLists = sourceLists + "<li><a href='articles.html?sourceId=" + key + "'>" + key + "</a> " + itemDate + "</li>";
-            break;
-          }
+          var itemDate = new Date(item["update"]);
+          itemDate = itemDate.toLocaleDateString() + " " + itemDate.toLocaleTimeString();
+          sourceLists = sourceLists + "<li><a target='_blank' href='articles.html?sourceId=" + item["key"] + "'>" + item["name"] + "</a> " + itemDate + "</li>";
         });
         $("#sources_status").html(sourceLists);
       }

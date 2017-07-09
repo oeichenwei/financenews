@@ -83,8 +83,7 @@
         if (docs.length > 0) {
           lastUpdateDate = docs[0]["recvDate"];
           if (util.lastRun && util.lastRun.details) {
-            var updateObj = {};
-            updateObj[sourceId] = lastUpdateDate;
+            var updateObj = {"key": sourceId, "update": lastUpdateDate, "name": util.getFriendlyName(sourceId)};
             util.lastRun.details.push(updateObj);
           }
         }

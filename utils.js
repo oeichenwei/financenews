@@ -10,13 +10,6 @@
   var CrawlUtil = {
   }
 
-  CrawlUtil.isGeneral = function(sourceId) {
-    var generalSources = ["wallstreet", "cn-finance", "haiqing_FICC", "jrhycom",
-          "cebmmacro",  "CEBM_research", "zepinghongguan", "CHINAFINANCE40FORUM",
-          "cfn-china", "FN_FinancialNews"];
-    return generalSources.includes(sourceId);
-  }
-
   CrawlUtil.mkdirSync = function(path) {
     try {
       fs.mkdirSync(path);
@@ -136,6 +129,67 @@
         fs.rmdirSync(path);
     }
   };
+
+  var allSources = {
+    "wallstreet": {type: "wallstreet", category: "general", name: "华尔街"},
+    "cn-finance": {type: "weixin", category: "general", name: "中国金融杂志"},
+    "haiqing_FICC": {type: "weixin", category: "general", name: "海清FICC频道"},
+    "jrhycom": {type: "weixin", category: "general", name: "金融行业网"},
+    "cebmmacro": {type: "weixin", category: "general", name: "莫尼塔宏观研究"},
+    "CEBM_research": {type: "weixin", category: "general", name: "莫尼塔研究"},
+    "zepinghongguan": {type: "weixin", category: "general", name: "泽平宏观"},
+    "CHINAFINANCE40FORUM": {type: "weixin", category: "general", name: "中国金融四十人论坛"},
+    "cfn-china": {type: "weixin", category: "general", name: "中国金融网"},
+    "FN_FinancialNews": {type: "weixin", category: "general", name: "中国金融新闻网"},
+    "midou888_zx": {type: "weixin", category: "future", name: "米斗资讯"},
+    "qihuozhoukan": {type: "weixin", category: "future", name: " 大宗内参"},
+    "gh_ae0f6dacaf22": {type: "weixin", category: "future", name: "东证衍生品研究院"},
+    "hedgechina": {type: "weixin", category: "future", name: "对冲研投"},
+    "hexun_futures": {type: "weixin", category: "future", name: "和讯期货"},
+    "gh_a16e4bca4323": {type: "weixin", category: "future", name: "华信万达风云能化团"},
+    "qhrb168": {type: "weixin", category: "future", name: " 期货日报"},
+    "elogic": {type: "weixin", category: "future", name: "经济逻辑"},
+    "jydmhg315": {type: "weixin", category: "future", name: " 金联创煤化工原金银岛煤化工资讯 "},
+    "langeweixin": {type: "weixin", category: "future", name: "兰格钢铁网"},
+    "gh_4a0f4b50dd80": {type: "weixin", category: "future", name: "鲁证能化观察"},
+    "nhqhscfzb": {type: "weixin", category: "future", name: "南华期货网络金融"},
+    "nmghgw": {type: "weixin", category: "future", name: "内蒙古化工"},
+    "cjshcce": {type: "weixin", category: "future", name: "上海煤炭交易中心"},
+    "puoketrader": {type: "weixin", category: "future", name: "扑克投资家"},
+    "ykxj123": {type: "weixin", category: "future", name: "天然橡胶"},
+    "v_breezes": {type: "weixin", category: "future", name: "V风"},
+    "Wanhua_Petrochemical": {type: "weixin", category: "future", name: "万华化学石化资讯"},
+    "Mysteel-shgl": {type: "weixin", category: "future", name: "我的钢铁网"},
+    "erds4888": {type: "weixin", category: "future", name: "亚太地区煤炭交易中心"},
+    "ydqhjy": {type: "weixin", category: "future", name: "一德菁英汇"},
+    "zsqhyjs": {type: "weixin", category: "future", name: "招商期货研究所"},
+    "zslsd_": {type: "weixin", category: "future", name: "找塑料视点"},
+    "cncotton": {type: "weixin", category: "future", name: "中储棉花信息中心"},
+    "CISA_chinaisa": {type: "weixin", category: "future", name: "中国钢铁工业协会"},
+    "CCAON-lvjian": {type: "weixin", category: "future", name: "中国氯碱网"},
+    "zlqh-yjy": {type: "weixin", category: "future", name: "中粮期货研究中心"},
+    "macrocs": {type: "weixin", category: "future", name: "中信宏观研究"},
+    "zhuochuangsteel": {type: "weixin", category: "future", name: "卓创钢铁"},
+    "sciplas": {type: "weixin", category: "future", name: "卓创塑料"}
+  };
+
+  CrawlUtil.isGeneral = function(sourceId) {
+    return allSources[sourceId].category === "general";
+  }
+
+  CrawlUtil.getFriendlyName = function(sourceId) {
+    return allSources[sourceId].name;
+  }
+
+  CrawlUtil.getAllWeixinSources = function() {
+    var ret = [];
+    for (var key in allSources) {
+      if (allSources[key].type === "weixin") {
+        ret.push(key);
+      }
+    }
+    return ret;
+  }
 
   if (typeof window !== 'undefined') {
     window.CrawlUtil = CrawlUtil;
