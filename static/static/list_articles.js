@@ -1,10 +1,13 @@
 'use strict';
 
 (function($) {
-  function buildNav(leastDate, mostDate, sourceId) {
+  function buildNav(leastDate, mostDate, sourceId, categoryId) {
     var sourceIdStr = "";
     if (sourceId) {
       sourceIdStr = "&sourceId=" + sourceId;
+    }
+    if (categoryId) {
+      sourceIdStr = "&category=" + categoryId;
     }
     console.log("buildNav, next date=", mostDate, " previous date=", leastDate);
     var nav = $([
@@ -17,10 +20,10 @@
     ].join("\n"));
     $("#articles").append(nav);
   }
-  function listArticles(date, type, sourceId) {
+  function listArticles(date, type, sourceId, categoryId) {
     $.ajax({
       url: "/query",
-      data: {count: 15, "sourceId": sourceId, "type": type, "date": date}, //cn-finance
+      data: {count: 15, "sourceId": sourceId, "category": categoryId, "type": type, "date": date}, //cn-finance
       dataType: "json",
       success: function(data) {
         console.log("listArticles success:", data.length)
@@ -40,7 +43,7 @@
           if (prevDate == 0 || prevDate < doc["recvDate"]) {
             prevDate = doc["recvDate"]
           }
-          var displayDate = (new Date(doc["recvDate"])).toLocaleDateString()
+          var displayDate = (new Date(doc["recvDate"])).toLocaleDateString() + " " + (new Date(doc["recvDate"])).toLocaleTimeString()
           var author = doc["author"]
           if (doc["author"] instanceof Object) {
             author = doc["author"]["display_name"]
@@ -89,7 +92,8 @@
   var type = url_query('type')
   type = type ? type : "next"
   var sourceId = url_query('sourceId')
+  var categoryId = url_query('category')
   console.log("parsed URL parameters: date=", date, ", sourceId=", sourceId, ", type=", type)
 
-  listArticles(date, type, sourceId)
+  listArticles(date, type, sourceId, categoryId)
 })(window.$);

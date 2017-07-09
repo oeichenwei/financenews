@@ -15,6 +15,15 @@ parser.addArgument(
   }
 );
 
+parser.addArgument(
+  [ '-s', '--skip' ],
+  {
+    action: "storeTrue",
+    defaultValue: false,
+    help: 'skip the initial crawling job'
+  }
+);
+
 var args = parser.parseArgs()
 
 var FinanceNewsCrawl = require("./financecrawl.js");
@@ -36,7 +45,9 @@ rule.hour = [8, 12, 20];
 rule.minute = 0;
 schedule.scheduleJob(rule, job);
 
-crawler.run();
+if (!args.skip) {
+  crawler.run();
+}
 
 var WebRender = require("./show.js");
 var webService = new WebRender();

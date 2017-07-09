@@ -81,7 +81,12 @@
         db.close();
         var lastUpdateDate = (new Date()).getTime() - 24*3600000
         if (docs.length > 0) {
-          lastUpdateDate = docs[0]["recvDate"]
+          lastUpdateDate = docs[0]["recvDate"];
+          if (util.lastRun && util.lastRun.details) {
+            var updateObj = {};
+            updateObj[sourceId] = lastUpdateDate;
+            util.lastRun.details.push(updateObj);
+          }
         }
         deferred.resolve(lastUpdateDate);
       });
@@ -89,7 +94,7 @@
     return deferred.promise;
   }
 
-  StockNewsDB.prototype.listArticles = function(count, datetime, type, sourceId) {
+  StockNewsDB.prototype.listArticles = function(count, datetime, type, sourceId, categoryId) {
     var deferred = Q.defer();
     MongoClient.connect(this.dburl, function(err, db) {
       if (err) {
@@ -108,7 +113,11 @@
       }
 
       if (sourceId && sourceId.length > 0) {
-        queryCondition["category"] = sourceId
+        queryCondition["sourceId"] = sourceId
+      }
+
+      if (categoryId && categoryId.length > 0) {
+        queryCondition["category"] = categoryId
       }
       console.log(queryCondition)
       db.collection('articles').find(queryCondition, {sort: {"recvDate": sortOrder}, limit: count}).toArray(function(err, docs) {

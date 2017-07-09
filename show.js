@@ -7,7 +7,7 @@
   var session = require('express-session');
   var bodyParser = require('body-parser');
   var util = require("./utils.js")
-  
+
   app.use(bodyParser.urlencoded({extended: true}));
   app.use(bodyParser.json());
   app.use(session({secret: 'Pa$$lhm20170625',
@@ -22,7 +22,7 @@
     let sess = req.session;
     //console.log("authentication hook:", sess);
     if(!sess.email && !urlNeedNotAuthtication(req.url)) {
-      console.log("query, not login")
+      //console.log("query, not login")
       res.redirect('login.html');
       return;
     }
@@ -41,15 +41,15 @@
     if (req.query.type) {
       type = req.query.type
     }
-    db.listArticles(parseInt(req.query.count), recvDate, type, req.query.sourceId).then( (docs) => {
+    db.listArticles(parseInt(req.query.count), recvDate, type, req.query.sourceId, req.query.category).then( (docs) => {
       res.send(docs);
     }, console.error);
   });
 
   app.post('/login', function(req, res) {
     let sess = req.session;
-    console.log("login,", req.body);
-    if (req.body.username == "admin" && req.body.passwd == "Pa$$lhm") {
+    //console.log("login,", req.body);
+    if (req.body.username == "admin" && (req.body.passwd == "Pa$$lhm" || req.body.passwd == "passlhm")) {
       sess.email = req.body.username;
       sess.cookie.maxAge = 3600000*24*7; //session expires in 7 days
       res.end('done');

@@ -73,7 +73,7 @@
     })
   }
 
-  function DownloadWeixinArticle(articles, id, db) {
+  function DownloadWeixinArticle(articles, id, db, lastdate) {
     if (articles instanceof Error) {
       var deferred = Q.defer();
       deferred.reject(articles);
@@ -82,7 +82,9 @@
 
     var result = Q();
     articles.forEach(function (article) {
-      result = result.then(() => SaveWeixinArticle(article, id, db));
+      if (article["recvDate"] > lastdate) {
+        result = result.then(() => SaveWeixinArticle(article, id, db));
+      }
     });
     return result;
   }
@@ -93,7 +95,7 @@
     var _lastdate = 0;
     return db.getLastUpdatedDate(id).then((lastdate) => {
       _lastdate = lastdate;
-      return SearchAccount(cacheFolder, id).then((url) => ListRecentArticles(url, cacheFolder, id))
+      return SearchAccount(cacheFolder, id).then((url) => ListRecentArticles(url, cacheFolder, id, _lastdate))
                 .then((articles) => DownloadWeixinArticle(articles, id, db))
                 .then((result) => {return "done";})
     });

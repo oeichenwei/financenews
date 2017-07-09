@@ -11,8 +11,8 @@
     <div class="blog-header">
         <h1 class="blog-title">资讯分类</h1>
         <ul>
-          <li><a href="articles.html?sourceId=general">金融经济咨讯</a></li>
-          <li><a href="articles.html?sourceId=future">行业咨讯</a></li>
+          <li><a href="articles.html?category=general">金融经济咨讯</a></li>
+          <li><a href="articles.html?category=future">行业咨讯</a></li>
         </ul>
         <h1 class="blog-title">最近一次更新状态：</h1>
         <p id="status"></p>
@@ -26,16 +26,35 @@
     data: {},
     dataType: "json",
     success: function(data) {
-      var updateDate = new Date(data["date"]);
-      updateDate = updateDate.toLocaleDateString() + updateDate.toLocaleTimeString();
-      var resultStr = " 成功";
-      if (!data["result"]) {
-        resultStr = "失败";
-        resultStr += " <a href='/proxy?url=" + encodeURI(data["verify"]) + "' target='_blank'>点击输入验证码</a>";
+      var updateDate = "正在";
+      var resultStr = " 中";
+      if (data["date"]) {
+        updateDate = new Date(data["date"]);
+        resultStr = " 成功";
+        updateDate = updateDate.toLocaleDateString() + " " + updateDate.toLocaleTimeString();
+        if (!data["result"]) {
+          resultStr = " 失败";
+          resultStr += " <a href='/verify?url=" + encodeURI(data["verify"]) + "' target='_blank'>点击输入验证码</a>";
+        }
       }
-
       $("#status").html(updateDate + " 更新 " + resultStr);
       console.log(updateDate, data);
+
+      if (data["details"] instanceof Array) {
+        var sourceLists = "";
+        data["details"].forEach(function(item) {
+          for(var key in item) {
+            var itemDate = new Date(item[key]);
+            itemDate = itemDate.toLocaleDateString() + " " + itemDate.toLocaleTimeString();
+            sourceLists = sourceLists + "<li><a href='articles.html?sourceId=" + key + "'>" + key + "</a> " + itemDate + "</li>";
+            break;
+          }
+        });
+        $("#sources_status").html(sourceLists);
+      }
+    },
+    error: function(xhr, textStatus, errorThrown){
+      $("#status").html("初始化未更新");
     }
   });
   </script>

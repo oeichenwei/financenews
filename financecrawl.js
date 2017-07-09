@@ -21,7 +21,7 @@
   var Q = require('q');
 
   function FinanceNewsCrawl() {
-    this.db = new StockNewsDB()
+    this.db = new StockNewsDB();
   }
 
   FinanceNewsCrawl.prototype.WrapWeixinJob = function(f) {
@@ -48,12 +48,15 @@
   }
 
   function successJob(result) {
-    util.lastRun = {date: (new Date()).getTime(), result: true};
+    util.lastRun["date"] = (new Date()).getTime();
+    util.lastRun["result"] = true;
     console.log(result);
   }
 
   function failedJob(err) {
-    util.lastRun = {date: (new Date()).getTime(), result: false, verify: err.message};
+    util.lastRun["date"] = (new Date()).getTime();
+    util.lastRun["result"] = false;
+    util.lastRun["verify"] = err.message;
     console.error(err);
   }
 
@@ -61,6 +64,7 @@
     if (!theDate) {
       theDate = new Date();
     }
+    util.lastRun = {startedate: theDate.getTime(), details: []};
     var dayOfYear = theDate.getDOY().toString();
     this.cacheFolder = path.join("caches", theDate.getFullYear().toString(), dayOfYear);
     var _this = this;
