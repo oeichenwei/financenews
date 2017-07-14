@@ -51,4 +51,4 @@ if (!args.skip) {
 
 var WebRender = require("./show.js");
 var webService = new WebRender();
-webService.run(args.port);
+webService.run(args.port, job);

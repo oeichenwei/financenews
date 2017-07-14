@@ -6,7 +6,9 @@
   var db = new StockNewsDB()
   var session = require('express-session');
   var bodyParser = require('body-parser');
-  var util = require("./utils.js")
+  var util = require("./utils.js");
+  var fs = require("fs");
+  var globalCrawler;
 
   app.use(bodyParser.urlencoded({extended: true}));
   app.use(bodyParser.json());
@@ -61,10 +63,29 @@
     res.send(util.lastRun);
   });
 
+  app.post('/doverify', function (req, res) {
+    console.log("doverify, post", req.body.verifycode);
+    var verifyCodeUrl = "https://mp.weixin.qq.com/mp/verifycode";
+    util.postForm(verifyCodeUrl, {cert: util.randomChallenge, input: req.body.verifycode}).then((obj) => res.send(obj));
+  });
+
+  app.get('/verify', function (req, res) {
+    util.VerifyWeixinCode().then(function(aa) {
+      let result = fs.readFileSync("./static/do_verify.html", "utf-8");
+      res.send(result);
+    });
+  });
+
+  app.get('/spider', function (req, res) {
+    res.send("done");
+    globalCrawler();
+  });
+
   function WebRender() {
   }
 
-  WebRender.prototype.run = function (listenPort) {
+  WebRender.prototype.run = function (listenPort, crawler) {
+    globalCrawler = crawler;
     var server = app.listen(listenPort, function () {
       var host = server.address().address;
       var port = server.address().port;

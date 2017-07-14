@@ -31,14 +31,19 @@
       return (mn + 1).toString() + "-" + dn.toString();
   };
 
-  CrawlUtil.downloadUrlCallback = function(url, filepath, willZip, cb) {
-    if (fs.existsSync(filepath)) {
+  CrawlUtil.downloadUrlCallback = function(url, filepath, willZip, encoding, cb) {
+    if (filepath && fs.existsSync(filepath)) {
       //console.log("  skipping, file has already been downloaded.", filepath);
-      cb(undefined, fs.readFileSync(filepath, "utf-8"));
+      cb(undefined, fs.readFileSync(filepath, encoding));//"utf-8"
       return;
     }
     console.log("downloading " + url + "...");
-    request(url, {timeout: 15000, gzip: willZip}, function (error, response, body) {
+    var options =  {timeout: 15000, gzip: willZip};
+    if (encoding == "binary") {
+      options["encoding"] = 'binary';
+      options["jar"] = true;
+    }
+    request(url, options, function (error, response, body) {
       if (error || response.statusCode != 200) {
         console.log("  error on downloading url:" + url);
         if (error) {
@@ -49,7 +54,9 @@
         cb(error, undefined);
         return;
       }
-      fs.writeFileSync(filepath, body, "utf-8");
+      if (filepath) {
+        fs.writeFileSync(filepath, body, encoding); //"utf-8"
+      }
       console.log("  done url:", url);
       cb(undefined, body);
     });
@@ -57,7 +64,7 @@
 
   CrawlUtil.downloadUrl = function(url, filepath, willZip = true) {
     var deferred = Q.defer();
-    CrawlUtil.downloadUrlCallback(url, filepath, willZip, function(err, result) {
+    CrawlUtil.downloadUrlCallback(url, filepath, willZip, "utf-8", function(err, result) {
       if (err) {
         deferred.reject(err);
         return;
@@ -67,23 +74,43 @@
     return deferred.promise;
   }
 
-  CrawlUtil.downloadUrlWeixin = function(url, filepath) {
+  CrawlUtil.postForm = function(posturl, formdata) {
+    var deferred = Q.defer();
+    console.log("postForm url=", posturl, " form=", formdata);
+    request.post({timeout: 15000, url:posturl, form: formdata, gzip:false, jar: true}, function(err, httpResponse, body){
+      console.log("postForm", err, body);
+      if (err) {
+        deferred.reject(err);
+        return;
+      }
+      deferred.resolve(body);
+    });
+    return deferred.promise;
+  }
+
+  CrawlUtil.downloadUrlWeixin = function(url, filepath, encoding = "utf-8", to = 3000) {
     var deferred = Q.defer();
     if (fs.existsSync(filepath)) {
-      deferred.resolve(fs.readFileSync(filepath, "utf-8"));
+      deferred.resolve(fs.readFileSync(filepath, encoding));
       return deferred.promise;
     }
 
     setTimeout(function(){
-      CrawlUtil.downloadUrlCallback(url, filepath, false, function(err, result) {
+      CrawlUtil.downloadUrlCallback(url, filepath, false, encoding, function(err, result) {
         if (err) {
           deferred.reject(err);
           return;
         }
         deferred.resolve(result);
       });
-    }, 3000);
+    }, to);
     return deferred.promise;
+  }
+
+  CrawlUtil.safeUnlinkFile = function (filepath) {
+    if (fs.existsSync(filepath)) {
+      fs.unlinkSync(filepath);
+    }
   }
 
   CrawlUtil.parseHTMLCallback = function(body, callback) {

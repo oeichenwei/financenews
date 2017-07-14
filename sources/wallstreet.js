@@ -27,7 +27,7 @@
           newUrl += articleListJson["data"]["next_cursor"]
           var newPath = path + recursiveNum
           recursiveNum = recursiveNum + 1
-          util.downloadUrlCallback(newUrl, newPath, true, function(err, doc) {
+          util.downloadUrlCallback(newUrl, newPath, true, "utf-8", function(err, doc) {
             if (err) {
               deferred.reject(err)
               return

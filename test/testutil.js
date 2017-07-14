@@ -30,5 +30,11 @@ describe('Util', function() {
       });
       assert.equal(testVector.length, allWeixinSources.length);
     });
+
+    it('check download image', function() {
+      let url = "http://images.csdn.net/20170714/%E6%BC%86%E8%BF%9C_meitu_1.jpg";
+      util.safeUnlinkFile("./test/test.jpg");
+      return util.downloadUrlWeixin(url, "./test/test.jpg", "binary", 10).then(() => {util.safeUnlinkFile("./test/test.jpg");});
+    });
   });
 });
