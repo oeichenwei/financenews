@@ -24,6 +24,15 @@ parser.addArgument(
   }
 );
 
+parser.addArgument(
+  [ '--skipauth' ],
+  {
+    action: "storeTrue",
+    defaultValue: false,
+    help: 'skip the authentication'
+  }
+);
+
 var args = parser.parseArgs()
 
 var FinanceNewsCrawl = require("./financecrawl.js");
@@ -56,4 +65,4 @@ if (!args.skip) {
 
 var WebRender = require("./show.js");
 var webService = new WebRender();
-webService.run(args.port, spiderJob);
+webService.run(args.port, spiderJob, args.skipauth);

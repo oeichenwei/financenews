@@ -8,7 +8,9 @@
   var bodyParser = require('body-parser');
   var util = require("./utils.js");
   var fs = require("fs");
+  var request = require("request");
   var globalCrawler;
+  var skipAuth = false;
 
   app.use(bodyParser.urlencoded({extended: true}));
   app.use(bodyParser.json());
@@ -17,6 +19,10 @@
                    resave: true}));
 
   function urlNeedNotAuthtication(url) {
+    if (skipAuth) {
+      return true;
+    }
+
     return (url.indexOf('login') != -1 || url.indexOf('css') != -1 || url.indexOf('jquery') != -1);
   }
 
@@ -79,23 +85,58 @@
         });
   });
 
+  app.post('/verifysogou', function (req, res) {
+    console.log("verifysogou, post", req.body.verifycode);
+    var verifyCodeUrl = "http://weixin.sogou.com/antispider/thank.php";
+    var options = {
+      c: req.body.verifycode,
+      r: "%2Fweixin%3Ftype%3D1%26s_from%3Dinput%26query%3Dcn-finance%26ie%3Dutf8%26_sug_%3Dn%26_sug_type_%3D",
+      v: "5"
+    }
+    util.postForm(verifyCodeUrl, options)
+        .then((obj) => {
+          obj = JSON.parse(obj);
+          console.log(obj);
+          if (obj["code"] == 0) {
+            delete util.sogouChallenge;
+            var newCookie = request.cookie('SNUID=' + obj["id"]);
+            util.cookie.setCookie(newCookie, "http://weixin.sogou.com/weixin");
+            var successCookie = request.cookie('seccodeRight=success');
+            util.cookie.setCookie(successCookie, "http://weixin.sogou.com/weixin");
+            var suvCookie = request.cookie('SUV=' + 1E3*(new Date()).getTime()+Math.round(1E3*Math.random()));
+            util.cookie.setCookie(suvCookie, "http://weixin.sogou.com/weixin");
+
+            globalCrawler();
+            res.redirect('/');
+          } else {
+            res.redirect('/verify');
+          }
+        });
+  });
+
   app.get('/verify', function (req, res) {
     util.VerifyWeixinCode().then(function(aa) {
-      let result = fs.readFileSync("./static/do_verify.html", "utf-8");
+      var result;
+      if (util.sogouChallenge) {
+        result = fs.readFileSync("./static/do_verify_sogou.html", "utf-8");
+      } else {
+        result = fs.readFileSync("./static/do_verify.html", "utf-8");
+      }
       res.send(result);
     });
   });
 
   app.get('/spider', function (req, res) {
-    res.send("done");
     globalCrawler();
+    res.redirect("/");
   });
 
   function WebRender() {
   }
 
-  WebRender.prototype.run = function (listenPort, crawler) {
+  WebRender.prototype.run = function (listenPort, crawler, skipauth) {
     globalCrawler = crawler;
+    skipAuth = skipauth;
     var server = app.listen(listenPort, function () {
       var host = server.address().address;
       var port = server.address().port;

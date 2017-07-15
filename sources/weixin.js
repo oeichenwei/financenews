@@ -14,15 +14,16 @@
         let retLink = theLink.attr("href");
         if (!retLink) {
           fs.unlinkSync(searchPath);
-          var deferred = Q.defer();
-          deferred.reject(new Error("search need authentication"));
-          return deferred.promise;
+          return new Error("search need authentication");
         }
         return retLink;
       });
   }
 
   function ListRecentArticles(url, cacheFolder, id, to=1000) {
+    if (url instanceof Error) {
+      return url;
+    }
     let listPath = path.join(cacheFolder, "list_" + id + ".html");
     let searchPath = path.join(cacheFolder, "search_" + id + ".html")
     return util.downloadUrlWeixin(url, listPath, "utf-8", to).then(util.parseHTML).then(function(window) {
@@ -117,15 +118,35 @@
     return util.downloadUrlWeixin(verifyCodeUrl, authImgPath, "binary", 10);
   }
 
+  function GetSougouVerifyCode() {
+    var sogouImgPath = path.join("./static", "sogou.jpg");
+    var randomChallenge = (new Date()).getTime();
+    var verifyCodeUrl = "http://weixin.sogou.com/antispider/util/seccode.php?tc=" + randomChallenge;
+    util.sogouChallenge = randomChallenge;
+    console.log("GetSougouVerifyCode", sogouImgPath, " challenge=",randomChallenge);
+    return util.downloadUrlWeixin(verifyCodeUrl, sogouImgPath, "binary", 10);
+  }
+
+  function HandleErrorCode(error) {
+    if (!(error instanceof Error)) {
+      return "need not to do authentication";
+    }
+    if (error.message === "search need authentication") {
+      return GetSougouVerifyCode();
+    }
+    return GetVerifyCode();
+  }
+
   function VerifyWeixinCode() {
     var cacheFolder = "./caches";
     var id = "cn-finance";
     util.safeUnlinkFile("./caches/list_cn-finance.html");
     util.safeUnlinkFile("./caches/search_cn-finance.html");
     util.safeUnlinkFile("./static/auth.jpg");
+    util.safeUnlinkFile("./static/sogou.jpg");
 
     return SearchAccount(cacheFolder, id, 10).then((url) => ListRecentArticles(url, cacheFolder, id, 10))
-              .then((error) => GetVerifyCode());
+              .then((error) => HandleErrorCode(error));
   }
 
   if (typeof window !== 'undefined') {

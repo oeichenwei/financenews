@@ -8,6 +8,7 @@
   var jsdom = require("jsdom");
 
   var CrawlUtil = {
+    cookie: request.jar()
   }
 
   CrawlUtil.mkdirSync = function(path) {
@@ -41,8 +42,9 @@
     var options =  {timeout: 15000, gzip: willZip};
     if (encoding == "binary") {
       options["encoding"] = 'binary';
-      options["jar"] = true;
     }
+    options["jar"] = CrawlUtil.cookie;
+    //console.log("using cookie: ", CrawlUtil.cookie.getCookieString(url));
     request(url, options, function (error, response, body) {
       if (error || response.statusCode != 200) {
         console.log("  error on downloading url:" + url);
@@ -77,7 +79,7 @@
   CrawlUtil.postForm = function(posturl, formdata) {
     var deferred = Q.defer();
     console.log("postForm url=", posturl, " form=", formdata);
-    request.post({timeout: 15000, url:posturl, form: formdata, gzip:false, jar: true}, function(err, httpResponse, body){
+    request.post({timeout: 15000, url:posturl, form: formdata, gzip:false, jar: CrawlUtil.cookie}, function(err, httpResponse, body){
       console.log("postForm", err, body);
       if (err) {
         deferred.reject(err);

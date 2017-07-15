@@ -3,3 +3,4 @@ node_modules
 caches
 static/auth.jpg
 *.docx
+static/sogou.jpg
