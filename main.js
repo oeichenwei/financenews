@@ -40,6 +40,11 @@ var job = function() {
   crawler.run(theDate);
 }
 
+var spiderJob = function() {
+  var theDate = new Date();
+  crawler.run(theDate);
+}
+
 var rule = new schedule.RecurrenceRule();
 rule.hour = [8, 12, 20];
 rule.minute = 0;
@@ -51,4 +56,4 @@ if (!args.skip) {
 
 var WebRender = require("./show.js");
 var webService = new WebRender();
-webService.run(args.port, job);
+webService.run(args.port, spiderJob);

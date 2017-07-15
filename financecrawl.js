@@ -57,7 +57,7 @@
     if (!theDate) {
       theDate = new Date();
     }
-    util.lastRun = {startedate: theDate.getTime(), details: []};
+    util.lastRun = {startedate: theDate.getTime(), details: {}};
     var dayOfYear = theDate.getDOY().toString();
     this.cacheFolder = path.join("caches", theDate.getFullYear().toString(), dayOfYear);
     var _this = this;

@@ -66,7 +66,17 @@
   app.post('/doverify', function (req, res) {
     console.log("doverify, post", req.body.verifycode);
     var verifyCodeUrl = "https://mp.weixin.qq.com/mp/verifycode";
-    util.postForm(verifyCodeUrl, {cert: util.randomChallenge, input: req.body.verifycode}).then((obj) => res.send(obj));
+    util.postForm(verifyCodeUrl, {cert: util.randomChallenge, input: req.body.verifycode})
+        .then((obj) => {
+          obj = JSON.parse(obj);
+          console.log(obj);
+          if (obj["ret"] == 0) {
+            globalCrawler();
+            res.redirect('/');
+          } else {
+            res.redirect('/verify');
+          }
+        });
   });
 
   app.get('/verify', function (req, res) {

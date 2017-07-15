@@ -11,14 +11,22 @@
     return util.downloadUrl(url, cacheFolder).then(util.parseHTML).then(function(window) {
       var mostValueNews = window.$("h3.ys_tb2:contains('重点资讯')").parent().parent();
       var topNews = mostValueNews.find("h3.height_24p").children('a');
+      var msgList = [];
       console.log("parse100ppiHome mostValueNews=", topNews.text(), " ", topNews.attr('href'));
-      var listNews = mostValueNews.children("ul").children();
-      listNews.each(function(a) {
-        console.log(a);
+      msgList.push({content_url: topNews.attr('href'), "content_short": topNews.text()});
+      var listNews = mostValueNews.find("ul").children("li");
+      listNews.each(function(idx) {
+        var links = window.$(listNews[idx]).find("a");
+        var theLink = window.$(links[1]);
+        msgList.push({content_url: theLink.attr('href'), "content_short": theLink.text()});
       })
-      console.log("parse100ppiHome listNews=");
-      return "done";
+      //console.log("parse100ppiHome listNews=", msgList);
+      return msgList;
     });
+  }
+
+  function downloadPPIArticle(articles) {
+
   }
 
   function Get100ppiSource(db, cacheFolder, id) {
@@ -27,7 +35,8 @@
     var homePath = path.join(cacheFolder, id + "_home.html");
     //console.log("Get100ppiSource", homeUrl," - ", homePath);
 
-    return db.getLastUpdatedDate(id).then((lastdate) => parse100ppiHome(homeUrl, homePath, lastdate));
+    return db.getLastUpdatedDate(id).then((lastdate) => parse100ppiHome(homeUrl, homePath, lastdate))
+             .then((articles) => downloadPPIArticle());
   }
 
   if (typeof window !== 'undefined') {

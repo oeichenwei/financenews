@@ -40,8 +40,8 @@
       }
       var retList = []
       if (!msgList) {
-        //fs.unlinkSync(listPath);
-        //fs.unlinkSync(searchPath);
+        fs.unlinkSync(listPath);
+        fs.unlinkSync(searchPath);
         return new Error(url);
       }
 

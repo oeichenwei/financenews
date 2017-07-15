@@ -40,13 +40,14 @@
       $("#status").html(updateDate + " 更新 " + resultStr);
       console.log(updateDate, data);
 
-      if (data["details"] instanceof Array) {
+      if (data["details"] instanceof Object) {
         var sourceLists = "";
-        data["details"].forEach(function(item) {
+        for (var key in data["details"]) {
+          var item = data["details"][key];
           var itemDate = new Date(item["update"]);
           itemDate = itemDate.toLocaleDateString() + " " + itemDate.toLocaleTimeString();
-          sourceLists = sourceLists + "<li><a target='_blank' href='articles.html?sourceId=" + item["key"] + "'>" + item["name"] + "</a> " + itemDate + "</li>";
-        });
+          sourceLists = sourceLists + "<li><a target='_blank' href='articles.html?sourceId=" + key + "'>" + item["name"] + "</a> " + itemDate + "</li>";
+        }
         $("#sources_status").html(sourceLists);
       }
     },

@@ -53,6 +53,16 @@
       let value = Object.assign({}, doc);
       delete value.recvDate
       delete value.uri
+
+      if (util.lastRun && util.lastRun.details) {
+        let updateObj = util.lastRun.details[doc["sourceId"]];
+        if (updateObj && doc["recvDate"] > updateObj["update"]) {
+          updateObj["update"] = doc["recvDate"];
+        } else {
+          util.lastRun.details[doc["sourceId"]] = {"update": doc["recvDate"], "name": util.getFriendlyName(doc["sourceId"])};
+        }
+      }
+
       collection.updateOne(key, {$set: value}, {upsert:true}, function(err, result) {
         if (err) {
           console.error(err, result);
@@ -83,8 +93,7 @@
         if (docs.length > 0) {
           lastUpdateDate = docs[0]["recvDate"];
           if (util.lastRun && util.lastRun.details) {
-            var updateObj = {"key": sourceId, "update": lastUpdateDate, "name": util.getFriendlyName(sourceId)};
-            util.lastRun.details.push(updateObj);
+            util.lastRun.details[sourceId] = {"update": lastUpdateDate, "name": util.getFriendlyName(sourceId)};
           }
         }
         deferred.resolve(lastUpdateDate);
