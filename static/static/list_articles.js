@@ -57,6 +57,7 @@
           var contentHtml = "";
           if (doc["content"]) {
             contentHtml = doc["content"].replace(/<([a-z][a-z0-9]*)[^>]*>/gi, "<$1>");
+            contentHtml = contentHtml.replace(/<h[0-9]([^>]*)>/gi, "<b$1>");
           }
           //contentHtml = contentHtml.replace(/<iframe.*>.*?<\/iframe>/gi, "");
           //contentHtml=contentHtml.replace(/<(?:.|\s)*?>/g, "");
