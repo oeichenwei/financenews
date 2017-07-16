@@ -18,6 +18,7 @@
   var StockNewsDB = require("./stocknewsdb.js")
   var WallStreetSource = require("./sources/wallstreet.js")
   var WeixinSource = require("./sources/weixin.js")
+  var Get100ppiSource = require("./sources/100ppi.js")
   var Q = require('q');
 
   function FinanceNewsCrawl() {
@@ -25,8 +26,13 @@
   }
 
   FinanceNewsCrawl.prototype.WrapWeixinJob = function(f) {
-    console.log("[updating...]", f);
+    console.log("[updating weixin...]", f);
     return WeixinSource(this.db, this.cacheFolder, f);
+  }
+
+  FinanceNewsCrawl.prototype.Wrap100ppiJob = function(f) {
+    console.log("[updating 100ppi...]", f);
+    return Get100ppiSource(this.db, this.cacheFolder, f);
   }
 
   FinanceNewsCrawl.prototype.AllWeixinAccounts = function() {
@@ -36,6 +42,17 @@
     var _this = this;
     weixinSources.forEach(function (f) {
       result = result.then(() => _this.WrapWeixinJob(f));
+    });
+    return result;
+  }
+
+  FinanceNewsCrawl.prototype.All100ppiSources = function() {
+    var ppiSources = util.getSourcesByType("100ppi");
+
+    var result = Q();
+    var _this = this;
+    ppiSources.forEach(function (f) {
+      result = result.then(() => _this.Wrap100ppiJob(f));
     });
     return result;
   }
@@ -64,6 +81,7 @@
     util.mkdirpSync(this.cacheFolder);
     this.db.createIndex()
         .then(() => WallStreetSource(_this.db, _this.cacheFolder))
+        .then(() => _this.All100ppiSources())
         .then(() => _this.AllWeixinAccounts())
         .then(successJob, failedJob);
   }

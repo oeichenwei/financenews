@@ -42,13 +42,8 @@
         return;
       }
       var collection = db.collection('articles');
-      //console.info("saveDoc");
-      if (util.isGeneral(doc["sourceId"])) {
-        doc["category"] = "general";
-      } else {
-        doc["category"] = "future";
-      }
-
+      doc["category"] = util.getCategory(doc["sourceId"]);
+      //console.info("saveDoc", doc);
       var key = {recvDate : doc["recvDate"], uri: doc["uri"]}
       let value = Object.assign({}, doc);
       delete value.recvDate
@@ -148,10 +143,7 @@
         deferred.reject(err);
         return;
       }
-      var category = "future";
-      if (util.isGeneral(sourceId)) {
-        category = "general";
-      }
+      var category = util.getCategory(sourceId);
 
       console.log("updateCategory category=", category);
       var collection = db.collection('articles');

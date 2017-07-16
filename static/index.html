@@ -13,6 +13,7 @@
         <ul>
           <li><a href="articles.html?category=general">金融经济咨讯</a></li>
           <li><a href="articles.html?category=future">行业咨讯</a></li>
+          <li><a href="articles.html?category=100ppi">100PPI</a></li>
         </ul>
         <h1 class="blog-title">最近一次更新状态：</h1>
         <p id="status"></p>
@@ -52,7 +53,7 @@
       }
     },
     error: function(xhr, textStatus, errorThrown){
-      $("#status").html("初始化未更新");
+      $("#status").html("初始化未更新 <a href='/spider?clean=1'> 立即更新 </a>");
     }
   });
   </script>

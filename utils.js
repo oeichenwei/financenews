@@ -32,6 +32,20 @@
       return (mn + 1).toString() + "-" + dn.toString();
   };
 
+  function RequestWithRetry(url, options, maxRetries, callback) {
+    request(url, options, function(error,response, body) {
+      if (error || response.statusCode != 200) {
+        if (maxRetries > 0) {
+          RequestWithRetry(url, options, maxRetries - 1, callback);
+        } else {
+          callback(error, response, body);
+        }
+      } else {
+        callback(error, response, body);
+      }
+    });
+  }
+
   CrawlUtil.downloadUrlCallback = function(url, filepath, willZip, encoding, cb) {
     if (filepath && fs.existsSync(filepath)) {
       //console.log("  skipping, file has already been downloaded.", filepath);
@@ -45,7 +59,7 @@
     }
     options["jar"] = CrawlUtil.cookie;
     //console.log("using cookie: ", CrawlUtil.cookie.getCookieString(url));
-    request(url, options, function (error, response, body) {
+    RequestWithRetry(url, options, 5, function (error, response, body) {
       if (error || response.statusCode != 200) {
         console.log("  error on downloading url:" + url);
         if (error) {
@@ -159,6 +173,13 @@
     }
   };
 
+  CrawlUtil.parseChineseDate = function(dateText) {
+    dateText = dateText.replace("年", "-");
+    dateText = dateText.replace("月", "-");
+    dateText = dateText.replace("日", "");
+    return Date.parse(dateText);
+  }
+
   var allSources = {
     "wallstreet": {type: "wallstreet", category: "general", name: "华尔街"},
     "cn-finance": {type: "weixin", category: "general", name: "中国金融杂志"},
@@ -199,25 +220,44 @@
     "zlqh-yjy": {type: "weixin", category: "future", name: "中粮期货研究中心"},
     "macrocs": {type: "weixin", category: "future", name: "中信宏观研究"},
     "zhuochuangsteel": {type: "weixin", category: "future", name: "卓创钢铁"},
-    "sciplas": {type: "weixin", category: "future", name: "卓创塑料"}
+    "sciplas": {type: "weixin", category: "future", name: "卓创塑料"},
+    "dianshi": {type: "100ppi", category: "100ppi", name: "电石"},
+    "propylene": {type: "100ppi", category: "100ppi", name: "丙烯"},
+    "d2x": {type: "100ppi", category: "100ppi", name: "丁二烯"},
+    "px": {type: "100ppi", category: "100ppi", name: "PX"},
+    "naoh": {type: "100ppi", category: "100ppi", name: "烧碱"},
+    "yixi": {type: "100ppi", category: "100ppi", name: "乙烯"},
+    "bopp": {type: "100ppi", category: "100ppi", name: "BOPP"},
+    "sbr": {type: "100ppi", category: "100ppi", name: "丁苯橡胶"},
+    "pe": {type: "100ppi", category: "100ppi", name: "LLDPE"},
+    "hdpe": {type: "100ppi", category: "100ppi", name: "HDPE"},
+    "pvc": {type: "100ppi", category: "100ppi", name: "PVC"},
+    "pp": {type: "100ppi", category: "100ppi", name: "PP"},
+    "ms": {type: "100ppi", category: "100ppi", name: "棉纱"},
+    "glass": {type: "100ppi", category: "100ppi", name: "玻璃"},
+    "hrb": {type: "100ppi", category: "100ppi", name: "螺纹钢"}
   };
 
-  CrawlUtil.isGeneral = function(sourceId) {
-    return allSources[sourceId].category === "general";
+  CrawlUtil.getCategory = function(sourceId) {
+    return allSources[sourceId].category;
   }
 
   CrawlUtil.getFriendlyName = function(sourceId) {
     return allSources[sourceId].name;
   }
 
-  CrawlUtil.getAllWeixinSources = function() {
+  CrawlUtil.getSourcesByType = function(type) {
     var ret = [];
     for (var key in allSources) {
-      if (allSources[key].type === "weixin") {
+      if (allSources[key].type === type) {
         ret.push(key);
       }
     }
     return ret;
+  }
+
+  CrawlUtil.getAllWeixinSources = function() {
+    return CrawlUtil.getSourcesByType("weixin");
   }
 
   if (typeof window !== 'undefined') {

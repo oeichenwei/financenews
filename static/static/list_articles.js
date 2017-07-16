@@ -49,7 +49,7 @@
             author = doc["author"]["display_name"]
           }
           var url = undefined
-          if (doc["sourceId"] === "wallstreet") {
+          if (doc["uri"]) {
             url = doc["uri"]
           } else {
             url = "http://mp.weixin.qq.com" + doc["content_url"]

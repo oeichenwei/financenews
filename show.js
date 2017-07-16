@@ -127,7 +127,8 @@
   });
 
   app.get('/spider', function (req, res) {
-    globalCrawler();
+    console.log("spider, argument=", req.query.clean);
+    globalCrawler(req.query.clean);
     res.redirect("/");
   });
 

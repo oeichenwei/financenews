@@ -41,17 +41,18 @@ var schedule = require('node-schedule');
 var util = require('./utils.js');
 var path = require('path');
 
-var job = function() {
+var spiderJob = function(cleanOld) {
   var theDate = new Date();
-  var dayOfYear = theDate.getDOY().toString();
-  var cacheFolder = path.join("caches", theDate.getFullYear().toString(), dayOfYear);
-  util.deleteFolderRecursive(cacheFolder);
+  if (cleanOld) {
+    var dayOfYear = theDate.getDOY().toString();
+    var cacheFolder = path.join("caches", theDate.getFullYear().toString(), dayOfYear);
+    util.deleteFolderRecursive(cacheFolder);
+  }
   crawler.run(theDate);
 }
 
-var spiderJob = function() {
-  var theDate = new Date();
-  crawler.run(theDate);
+var job = function() {
+  spiderJob(true);
 }
 
 var rule = new schedule.RecurrenceRule();
