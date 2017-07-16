@@ -19,6 +19,7 @@
   var WallStreetSource = require("./sources/wallstreet.js")
   var WeixinSource = require("./sources/weixin.js")
   var Get100ppiSource = require("./sources/100ppi.js")
+  var GetChinaCefNews = require("./sources/chinacef.js")
   var Q = require('q');
 
   function FinanceNewsCrawl() {
@@ -81,6 +82,7 @@
     util.mkdirpSync(this.cacheFolder);
     this.db.createIndex()
         .then(() => WallStreetSource(_this.db, _this.cacheFolder))
+        .then(() => GetChinaCefNews(_this.db, _this.cacheFolder))
         .then(() => _this.All100ppiSources())
         .then(() => _this.AllWeixinAccounts())
         .then(successJob, failedJob);

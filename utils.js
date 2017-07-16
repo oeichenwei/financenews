@@ -182,6 +182,7 @@
 
   var allSources = {
     "wallstreet": {type: "wallstreet", category: "general", name: "华尔街"},
+    "chinacef" : {type: "chinacef", category: "general", name: "中国首席经济学家论坛"},
     "cn-finance": {type: "weixin", category: "general", name: "中国金融杂志"},
     "haiqing_FICC": {type: "weixin", category: "general", name: "海清FICC频道"},
     "jrhycom": {type: "weixin", category: "general", name: "金融行业网"},
