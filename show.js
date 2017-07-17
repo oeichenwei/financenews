@@ -132,6 +132,11 @@
     res.redirect("/");
   });
 
+  app.get('/score', function (req, res) {
+    console.log("score, uri=", req.query.uri, ", recvDate=", req.query.recvDate, ", score=", req.query.score);
+    db.updateScore(req.query.uri, parseInt(req.query.recvDate), parseInt(req.query.score)).then((result) => res.send(result));
+  });
+
   function WebRender() {
   }
 

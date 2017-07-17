@@ -1,5 +1,23 @@
 'use strict';
 
+function hideArticle(aId, uri, recvDate) {
+  console.log("hideArticle, id=", aId, ", uri=", uri, ", recvDate=", recvDate);
+  markArticle(uri, recvDate, 0);
+  $("div#"+aId).hide();
+}
+
+function markArticle(uri, recvDate, score) {
+  console.log("markArticle, uri=", uri, ", recvDate=", recvDate, ", score=", score);
+  $.ajax({
+    url: "/score",
+    data: {"uri": uri, "recvDate": recvDate, "score": score},
+    dataType: "json",
+    success: function(data) {
+      console.log(data);
+    }
+  });
+}
+
 (function($) {
   function buildNav(leastDate, mostDate, sourceId, categoryId) {
     var sourceIdStr = "";
@@ -59,13 +77,19 @@
             contentHtml = doc["content"].replace(/<([a-z][a-z0-9]*)[^>]*>/gi, "<$1>");
             contentHtml = contentHtml.replace(/<h[0-9]([^>]*)>/gi, "<b$1>");
           }
-          //contentHtml = contentHtml.replace(/<iframe.*>.*?<\/iframe>/gi, "");
-          //contentHtml=contentHtml.replace(/<(?:.|\s)*?>/g, "");
+          var score = "";
+          if (doc["score"] != undefined)
+            score = " [" + doc['score'] + "] ";
+          var aId = doc["sourceId"] + "_" + (doc["id"] || doc["fileid"]);
+          var hideButton = '<button class="btn" onclick="hideArticle(\'' + aId + '\',\'' + url + '\',' + doc["recvDate"] + ')">无关</button>';
+          var positiveBtn = '<button class="btn btn-primary" onclick="markArticle(\'' + url + '\',' + doc["recvDate"] + ', 1)">正面</button>';
+          var negativeBtn = '<button class="btn btn-primary" onclick="markArticle(\'' + url + '\',' + doc["recvDate"] + ', -1)">负面</button>';
           var row = $([
-            '<div class="blog-post">',
-            '  <h2 class="blog-post-title">' + doc["title"] + '</h2>',
-            '  <p class="blog-post-meta">' + displayDate + ' by ' + author + ' from ' + doc["sourceId"] + ' <a target="_blank" href="' + url + '">original link</a></p>',
+            '<div class="blog-post" id="' + aId + '">',
+            '  <h2 class="blog-post-title">' + doc["title"] + score + '</h2>',
+            '  <p class="blog-post-meta">' + displayDate + ' by ' + author + ' from ' + doc["sourceId"] + ' <a target="_blank" href="' + url + '">original link</a> ' + hideButton + '</p>',
             '  <p>' + contentHtml + '</p>',
+            '  <p align="center"> ' + positiveBtn + '&nbsp;&nbsp;' + negativeBtn + '<br><br><br></p>',
             '</div><!-- /.blog-post -->'
             ].join("\n"));
           $("#articles").append(row);

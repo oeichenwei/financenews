@@ -135,6 +135,26 @@
     return deferred.promise;
   }
 
+  StockNewsDB.prototype.updateScore = function(uri, recvDate, score) {
+    var deferred = Q.defer();
+    MongoClient.connect(this.dburl, function(err, db) {
+      if (err) {
+        deferred.reject(err);
+        return;
+      }
+      var collection = db.collection('articles');
+      collection.update({"uri": uri.trim(), "recvDate": recvDate}, {$set: {"score": score}}, function(err, result) {
+        if (err) {
+          console.error(err, result);
+        }
+        console.log("done for updateScore uri=", uri, ", score=", score);
+        db.close();
+        deferred.resolve("success");
+      });
+    });
+    return deferred.promise;
+  }
+
   StockNewsDB.prototype.updateCategory = function(sourceId) {
     console.log("updateCategory", sourceId);
     var deferred = Q.defer();
