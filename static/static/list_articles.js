@@ -71,7 +71,7 @@
           $("#articles").append(row);
         });
 
-        buildNav(prevDate, nextDate, sourceId)
+        buildNav(prevDate, nextDate, sourceId, categoryId)
       }
     });
   }
