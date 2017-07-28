@@ -63,12 +63,26 @@
     })
   }
 
+  function hashCode(str){
+      var hash = 0;
+      if (str.length == 0) return hash;
+      for (var i = 0; i < str.length; i++) {
+          var chcode = str.charCodeAt(i);
+          hash = ((hash<<5)-hash)+chcode;
+          hash = hash & hash; // Convert to 32bit integer
+      }
+      return hash;
+  }
+
   function SaveWeixinArticle(article, id, db) {
     var url;
     if (article["content_url"].indexOf("http://") >= 0) {
       url = article["content_url"].replace(/&amp;/gi,"&");
     } else {
       url = "http://mp.weixin.qq.com" + article["content_url"].replace(/&amp;/gi,"&");
+    }
+    if (article["fileid"] == 0) {
+      article["fileid"] = hashCode(article["content_url"]);
     }
     let cacheArticlePath = path.join("caches", "weixin", id + "_" + article["fileid"] + "_" + article["comm_msg_info"]["id"] + ".html")
     return util.downloadUrlWeixin(url, cacheArticlePath).then(util.parseHTML).then(function(window) {
