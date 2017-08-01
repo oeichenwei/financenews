@@ -13,4 +13,14 @@ function updateExistingRecords(){
   return result;
 }
 
-updateExistingRecords().then(console.log, console.error);
+//updateExistingRecords().then(console.log, console.error);
+
+function updateSimpleRating(days) {
+  var db = new StockNewsDB();
+  db.findRecentUnratedDocs(days).then((docs) =>{
+    console.log("findRecentUnratedDocs, length=", docs.length);
+    db.resaveDocRecursively(docs);
+  }).then(console.log, console.error);
+}
+
+updateSimpleRating(1);

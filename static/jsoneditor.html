@@ -1,0 +1,54 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <!-- when using the mode "code", it's important to specify charset utf-8 -->
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <link href="static/jsoneditor.min.css" rel="stylesheet" type="text/css">
+    <script src="static/jsoneditor.min.js"></script>
+    <script type='text/javascript' src="static/jquery.min.js"></script>
+</head>
+<body>
+  <div align="center">
+    <div id="jsoneditor" style="width: 400px; height: 400px;"></div>
+    <p>
+      <button onclick="getJSON();">Save</button>
+    </p>
+  </div>
+</body>
+<script>
+    // create the editor
+    var container = document.getElementById("jsoneditor");
+    var options = {
+      mode: 'code'
+    };
+    var editor = new JSONEditor(container, options);
+
+    // set json
+    function setJSON () {
+      $.ajax({
+        url: "/getkeyword",
+        data: {},
+        dataType: "json",
+        success: function(data) {
+          editor.set(data);
+        }
+      });
+    }
+
+    // get json
+    function getJSON() {
+        $.ajax({
+          type: "PUT",
+          url: "/setkeyword",
+          contentType: "application/json",
+          data: JSON.stringify(editor.get()),
+          success: function(data) {
+            console.log(data);
+          }
+        });
+    }
+
+    setJSON();
+</script>
+
+</html>

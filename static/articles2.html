@@ -1,0 +1,143 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>最新金融资讯</title>
+  <link href="static/bootstrap.min.css" rel="stylesheet" type="text/css" />
+  <link href="static/custom.css" rel="stylesheet" type="text/css" />
+  <script type='text/javascript' src="static/jquery.min.js"></script>
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body>
+  <div class="container">
+    <div class="blog-header">
+        <h1 class="blog-title">最新金融资讯</h1>
+        <p class="lead blog-description">根据关键词排序</p>
+    </div>
+    <hr/>
+    <div class="row">
+        <div class="col-sm-12 blog-main" id="articles">
+        </div><!-- /.blog-main -->
+    </div>
+  </div>
+</body>
+<script type='text/javascript'>
+'use strict';
+
+function hideArticle(aId, uri, recvDate) {
+  console.log("hideArticle, id=", aId, ", uri=", uri, ", recvDate=", recvDate);
+  markArticle(uri, recvDate, 0);
+  $("div#"+aId).hide();
+}
+
+function markArticle(uri, recvDate, score) {
+  console.log("markArticle, uri=", uri, ", recvDate=", recvDate, ", score=", score);
+  $.ajax({
+    url: "/score",
+    data: {"uri": uri, "recvDate": recvDate, "score": score},
+    dataType: "json",
+    success: function(data) {
+      console.log(data);
+    }
+  });
+}
+
+(function($) {
+  function buildNav(page, startDate, sourceId, categoryId) {
+    var sourceIdStr = "";
+    if (sourceId) {
+      sourceIdStr = "&sourceId=" + sourceId;
+    }
+    if (categoryId) {
+      sourceIdStr = "&category=" + categoryId;
+    }
+    console.log("buildNav, page=", page, " startDate=", startDate, sourceIdStr);
+    var nav = $([
+      '<nav>',
+      ' <ul class="pager">',
+      (page >= 1) ? '  <li><a href="?page=' + (page-1) + '&date=' + startDate + sourceIdStr + '">上一页</a></li>' : '',
+      '  <li><a href="?page=' + (page+1) + '&date=' + startDate + sourceIdStr + '">下一页</a></li>',
+      ' </ul>',
+      '</nav>'
+    ].join("\n"));
+    $("#articles").append(nav);
+  }
+
+  function listArticles(date, page, sourceId, categoryId) {
+    var pageCount = 15;
+    var skip = page * pageCount;
+    $.ajax({
+      url: "/querybyscore",
+      data: {count: pageCount, "sourceId": sourceId, "category": categoryId, "skip": skip, "date": date}, //cn-finance
+      dataType: "json",
+      success: function(data) {
+        console.log("listArticles success:", data.length)
+        data.forEach(function(doc) {
+          var displayDate = (new Date(doc["recvDate"])).toLocaleDateString() + " " + (new Date(doc["recvDate"])).toLocaleTimeString()
+          var author = doc["author"]
+          if (doc["author"] instanceof Object) {
+            author = doc["author"]["display_name"]
+          }
+          var url = undefined
+          if (doc["uri"]) {
+            url = doc["uri"]
+          } else {
+            url = "http://mp.weixin.qq.com" + doc["content_url"]
+          }
+          var contentHtml = "";
+          if (doc["content"]) {
+            contentHtml = doc["content"].replace(/<([a-z][a-z0-9]*)[^>]*>/gi, "<$1>");
+            contentHtml = contentHtml.replace(/<h[0-9]([^>]*)>/gi, "<b$1>");
+          }
+          var score = "";
+          if (doc["score"] != undefined)
+            score += " [" + doc['score'] + "] ";
+          var tags = ""
+          if (doc["simpleRate"] != undefined)
+            tags += " {" + doc['simpleRate']['tags'].join(",") + "} ";
+
+          var aId = doc["sourceId"] + "_" + (doc["id"] || doc["fileid"]);
+          var hideButton = '<button class="btn" onclick="hideArticle(\'' + aId + '\',\'' + url + '\',' + doc["recvDate"] + ')">无关</button>';
+          var positiveBtn = '<button class="btn btn-primary" onclick="markArticle(\'' + url + '\',' + doc["recvDate"] + ', 1)">正面</button>';
+          var negativeBtn = '<button class="btn btn-primary" onclick="markArticle(\'' + url + '\',' + doc["recvDate"] + ', -1)">负面</button>';
+          var row = $([
+            '<div class="blog-post" id="' + aId + '">',
+            '  <h2 class="blog-post-title">' + doc["title"] + score + '</h2>',
+            '  <p class="blog-post-meta">' + displayDate + ' by ' + author + ' from ' + doc["sourceId"] + ' <a target="_blank" href="' + url + '">original link</a> ' + tags + hideButton + '</p>',
+            '  <p>' + contentHtml + '</p>',
+            '  <p align="center"> ' + positiveBtn + '&nbsp;&nbsp;' + negativeBtn + '<br><br><br></p>',
+            '</div><!-- /.blog-post -->'
+            ].join("\n"));
+          $("#articles").append(row);
+        });
+
+        buildNav(page, date, sourceId, categoryId)
+      }
+    });
+  }
+
+  function url_query( query ) {
+    query = query.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+    var expr = "[\\?&]"+query+"=([^&#]*)";
+    var regex = new RegExp( expr );
+    var results = regex.exec( window.location.href );
+    if ( results !== null ) {
+        return results[1];
+    } else {
+        return undefined;
+    }
+  }
+
+  var days = url_query('days');
+  days = days ? parseInt(date) : 1;
+  var date = url_query('date');
+  date = date ? parseInt(date) : ((new Date()).getTime() - 24*3600000*days);
+
+  var page = url_query('page');
+  page = page ? parseInt(page) : 0;
+  var sourceId = url_query('sourceId');
+  var categoryId = url_query('category');
+  console.log("parsed URL parameters: date=", date, ", sourceId=", sourceId, ", page=", page);
+  listArticles(date, page, sourceId, categoryId)
+})(window.$);
+</script>
+</html>

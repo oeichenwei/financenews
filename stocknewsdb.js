@@ -3,6 +3,7 @@
   var Q = require('q')
   var MongoClient = require('mongodb').MongoClient
   var util = require("./utils.js")
+  var SimpleRating = require('./tagging/simplerating.js');
 
   function StockNewsDB(url) {
     console.log("StockNewsDB new instance, url=", url)
@@ -12,6 +13,7 @@
       // default URL
       this.dburl = 'mongodb://localhost:27017/stocknews';
     }
+    this.simpleRate = new SimpleRating();
   }
 
   StockNewsDB.prototype.createIndex = function() {
@@ -36,6 +38,7 @@
 
   StockNewsDB.prototype.saveDoc = function(doc) {
     var deferred = Q.defer();
+    var _this = this;
     MongoClient.connect(this.dburl, function(err, db) {
       if (err) {
         deferred.reject(err);
@@ -58,13 +61,53 @@
         }
       }
 
-      collection.updateOne(key, {$set: value}, {upsert:true}, function(err, result) {
+      _this.simpleRate.rateOne(doc["content"]).then( (rating) => {
+        value["simpleRate"] = rating;
+        collection.updateOne(key, {$set: value}, {upsert:true}, function(err, result) {
+          if (err) {
+            console.error(err, result);
+          }
+          db.close();
+          //console.log("saved");
+          deferred.resolve(result);
+        });
+      });
+    });
+    return deferred.promise;
+  }
+
+  StockNewsDB.prototype.resaveDocRecursively = function (docs) {
+    var result = Q();
+    var _this = this;
+    console.log("resaveDocRecursively", this);
+    docs.forEach(function (doc) {
+      result = result.then(() => _this.saveDoc(doc));
+    });
+    return result;
+  }
+
+  StockNewsDB.prototype.findRecentUnratedDocs = function(days) {
+    if (!days) {
+      days = 1;
+    }
+    var deferred = Q.defer();
+    var _this = this;
+    MongoClient.connect(this.dburl, function(err, db) {
+      if (err) {
+        deferred.reject(err);
+        return;
+      }
+      console.log("Connected correctly to server for ratingForDays days=", days);
+      var sinceDate = (new Date()).getTime() - days * 24 * 3600000;
+      var queryCondition = {"recvDate": { $gt: sinceDate }, "simpleRate": { $eq: null}};
+      //console.log(queryCondition)
+      db.collection('articles').find(queryCondition).toArray(function(err, docs) {
         if (err) {
-          console.error(err, result);
+          deferred.reject(err);
+          return;
         }
         db.close();
-        //console.log("saved");
-        deferred.resolve(result);
+        deferred.resolve(docs);
       });
     });
     return deferred.promise;
@@ -84,7 +127,7 @@
           return;
         }
         db.close();
-        var lastUpdateDate = (new Date()).getTime() - 24*3600000
+        var lastUpdateDate = (new Date()).getTime() - 24*3600000;
         if (docs.length > 0) {
           lastUpdateDate = docs[0]["recvDate"];
           if (util.lastRun && util.lastRun.details) {
@@ -124,6 +167,37 @@
       }
       console.log(queryCondition)
       db.collection('articles').find(queryCondition, {sort: {"recvDate": sortOrder}, limit: count}).toArray(function(err, docs) {
+        if (err) {
+          deferred.reject(err);
+          return;
+        }
+        db.close();
+        deferred.resolve(docs);
+      });
+    });
+    return deferred.promise;
+  }
+
+  StockNewsDB.prototype.listArticlesOrderByScore = function(skip, count, datetime, sourceId, categoryId) {
+    var deferred = Q.defer();
+    MongoClient.connect(this.dburl, function(err, db) {
+      if (err) {
+        deferred.reject(err);
+        return;
+      }
+      console.log("Connected correctly to server for listArticlesOrderByScore date=", datetime, "sourceId=", sourceId);
+      if (!datetime || datetime <= 0) {
+        datetime = (new Date()).getTime() - 24*3600000
+      }
+      var queryCondition = {"recvDate": { $gt: datetime }}
+      if (sourceId && sourceId.length > 0) {
+        queryCondition["sourceId"] = sourceId
+      }
+      if (categoryId && categoryId.length > 0) {
+        queryCondition["category"] = categoryId
+      }
+      console.log(queryCondition)
+      db.collection('articles').find(queryCondition, {"skip": skip, sort: {"simpleRate.score": -1}, limit: count}).toArray(function(err, docs) {
         if (err) {
           deferred.reject(err);
           return;

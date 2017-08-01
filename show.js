@@ -54,6 +54,32 @@
     }, console.error);
   });
 
+  app.get('/getkeyword', function (req, res) {
+    var keywordsStr = fs.readFileSync("./keywords.json");
+    res.send(JSON.parse(keywordsStr));
+  });
+
+  app.put('/setkeyword', function (req, res) {
+    console.log(req.body);
+    fs.writeFileSync("./keywords.json",JSON.stringify(req.body));
+    res.send("success");
+  });
+
+  app.get('/querybyscore', function (req, res) {
+    console.log("query: count=", req.query.count, ", date=", req.query.date, ", source=", req.query.sourceId)
+    var recvDate = undefined
+    if (req.query.date) {
+      recvDate = parseInt(req.query.date)
+    }
+    var skip = 0
+    if (req.query.skip) {
+      skip = parseInt(req.query.skip)
+    }
+    db.listArticlesOrderByScore(skip, parseInt(req.query.count), recvDate, req.query.sourceId, req.query.category).then( (docs) => {
+      res.send(docs);
+    }, console.error);
+  });
+
   app.post('/login', function(req, res) {
     let sess = req.session;
     //console.log("login,", req.body);
