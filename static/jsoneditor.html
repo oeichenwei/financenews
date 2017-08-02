@@ -6,12 +6,13 @@
     <link href="static/jsoneditor.min.css" rel="stylesheet" type="text/css">
     <script src="static/jsoneditor.min.js"></script>
     <script type='text/javascript' src="static/jquery.min.js"></script>
+    <meta name="viewport" content="width=device-width" />
 </head>
 <body>
   <div align="center">
     <div id="jsoneditor" style="width: 400px; height: 400px;"></div>
     <p>
-      <button onclick="getJSON();">Save</button>
+      <button onclick="window.location='/'">返回</button> <button onclick="getJSON();">保存</button>
     </p>
   </div>
 </body>
@@ -37,13 +38,21 @@
 
     // get json
     function getJSON() {
-        $.ajax({
+      var jsonVal = "";
+      try {
+        jsonVal = editor.get();
+      } catch(err) {
+        alert(err);
+        return;
+      }
+
+      $.ajax({
           type: "PUT",
           url: "/setkeyword",
           contentType: "application/json",
-          data: JSON.stringify(editor.get()),
+          data: JSON.stringify(jsonVal),
           success: function(data) {
-            console.log(data);
+            alert(data);
           }
         });
     }

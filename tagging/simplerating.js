@@ -5,19 +5,17 @@
   var MongoClient = require('mongodb').MongoClient
   var util = require("../utils.js")
 
-  function SimpleRating() {
-    this.initalize();
+  var SimpleRating = {
   }
 
-  SimpleRating.prototype.initalize = function() {
+  SimpleRating.initalize = function() {
     var keywordsStr = fs.readFileSync("./keywords.json");
-    this.keywords = JSON.parse(keywordsStr);
-    //console.log(this.keywords);
+    SimpleRating.keywords = JSON.parse(keywordsStr);
   }
 
-  SimpleRating.prototype.rateOne = function(fulltext) {
+  SimpleRating.rateOne = function(fulltext) {
     var deferred = Q.defer();
-    var keywordsJson = this.keywords;
+    var keywordsJson = SimpleRating.keywords;
     require("jsdom").env("", function(err, window) {
       if (err) {
         console.error(err);
@@ -47,6 +45,7 @@
   }
 
   if (typeof module !== 'undefined' && module.exports) {
+    SimpleRating.initalize();
     module.exports = SimpleRating;
   }
 })();

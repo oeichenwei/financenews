@@ -17,7 +17,7 @@ function updateExistingRecords(){
 
 function updateSimpleRating(days) {
   var db = new StockNewsDB();
-  db.findRecentUnratedDocs(days).then((docs) =>{
+  db.findRecentUnratedDocs(days, true).then((docs) =>{
     console.log("findRecentUnratedDocs, length=", docs.length);
     db.resaveDocRecursively(docs);
   }).then(console.log, console.error);

@@ -11,6 +11,7 @@
   var request = require("request");
   var globalCrawler;
   var skipAuth = false;
+  var simpleRate = require('./tagging/simplerating.js');
 
   app.use(bodyParser.urlencoded({extended: true}));
   app.use(bodyParser.json());
@@ -62,7 +63,11 @@
   app.put('/setkeyword', function (req, res) {
     console.log(req.body);
     fs.writeFileSync("./keywords.json",JSON.stringify(req.body));
-    res.send("success");
+    simpleRate.initalize();
+    db.findRecentUnratedDocs(1, true).then((docs) =>{
+      console.log("findRecentUnratedDocs, length=", docs.length);
+      return db.resaveDocRecursively(docs);
+    }).then((result) => res.send("success"), res.send);
   });
 
   app.get('/querybyscore', function (req, res) {

@@ -3,7 +3,7 @@
   var Q = require('q')
   var MongoClient = require('mongodb').MongoClient
   var util = require("./utils.js")
-  var SimpleRating = require('./tagging/simplerating.js');
+  var simpleRate = require('./tagging/simplerating.js');
 
   function StockNewsDB(url) {
     console.log("StockNewsDB new instance, url=", url)
@@ -13,7 +13,6 @@
       // default URL
       this.dburl = 'mongodb://localhost:27017/stocknews';
     }
-    this.simpleRate = new SimpleRating();
   }
 
   StockNewsDB.prototype.createIndex = function() {
@@ -61,7 +60,7 @@
         }
       }
 
-      _this.simpleRate.rateOne(doc["content"]).then( (rating) => {
+      simpleRate.rateOne(doc["content"]).then( (rating) => {
         value["simpleRate"] = rating;
         collection.updateOne(key, {$set: value}, {upsert:true}, function(err, result) {
           if (err) {
@@ -86,7 +85,7 @@
     return result;
   }
 
-  StockNewsDB.prototype.findRecentUnratedDocs = function(days) {
+  StockNewsDB.prototype.findRecentUnratedDocs = function(days, force) {
     if (!days) {
       days = 1;
     }
@@ -100,6 +99,9 @@
       console.log("Connected correctly to server for ratingForDays days=", days);
       var sinceDate = (new Date()).getTime() - days * 24 * 3600000;
       var queryCondition = {"recvDate": { $gt: sinceDate }, "simpleRate": { $eq: null}};
+      if (force) {
+        delete queryCondition.simpleRate;
+      }
       //console.log(queryCondition)
       db.collection('articles').find(queryCondition).toArray(function(err, docs) {
         if (err) {
