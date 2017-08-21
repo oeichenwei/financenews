@@ -52,7 +52,7 @@ var spiderJob = function(cleanOld) {
 }
 
 var job = function() {
-  spiderJob(true);
+  //spiderJob(true);
 }
 
 var rule = new schedule.RecurrenceRule();

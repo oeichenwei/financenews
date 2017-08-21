@@ -10,11 +10,23 @@
   <div class="container">
     <div class="blog-header">
         <h1 class="blog-title">资讯分类</h1>
-        <p><a href="jsoneditor.html">查看编辑关键词</a></p>
+        <p><a href="jsoneditor.html">查看编辑关键词</a>
+        <form id="days" name="days" style="display:inline;">
+        <table cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td rowspan="2"><input type="text" id="number" name="number" value="1" style="width:50px;height:23px;font-weight:bold;" /></td>
+            <td><input type="button" value=" /\ " onclick="this.form.number.value++;" style="font-size:7px;margin:0;padding:0;width:20px;height:13px;" ></td>
+          </tr>
+          <tr>
+            <td><input type=button value=" \/ " onclick="this.form.number.value--;" style="font-size:7px;margin:0;padding:0;width:20px;height:12px;" ></td>
+          </tr>
+        </table>
+        </form>
+      </p>
         <ul>
-          <li><a href="articles.html?category=general">金融经济咨讯</a>&nbsp;&nbsp;&nbsp;<a href="articles2.html?category=general">最相关</a></li>
-          <li><a href="articles.html?category=future">行业咨讯</a>&nbsp;&nbsp;&nbsp;<a href="articles2.html?category=future">最相关</a></li>
-          <li><a href="articles.html?category=100ppi">100PPI</a>&nbsp;&nbsp;&nbsp;<a href="articles2.html?category=100ppi">最相关</a></li>
+          <li><a href="articles.html?category=general">金融经济咨讯</a>&nbsp;&nbsp;&nbsp;<a href="javascript:openArticle2('general');">最相关</a></li>
+          <li><a href="articles.html?category=future">行业咨讯</a>&nbsp;&nbsp;&nbsp;<a href="javascript:openArticle2('future');">最相关</a></li>
+          <li><a href="articles.html?category=100ppi">100PPI</a>&nbsp;&nbsp;&nbsp;<a href="javascript:openArticle2('100ppi');">最相关</a></li>
         </ul>
         <h1 class="blog-title">最近一次更新状态：</h1>
         <p id="status"></p>
@@ -23,6 +35,11 @@
     </div>
   </div>
   <script>
+  function openArticle2(category) {
+    var newRef = "articles2.html?category=" + category + "&days=" + $("#number").val();
+    window.location.href = newRef;
+  }
+
   $.ajax({
     url: "/status",
     data: {},
@@ -37,6 +54,8 @@
         if (!data["result"]) {
           resultStr = " 失败";
           resultStr += " <a href='/verify?url=" + encodeURI(data["verify"]) + "' target='_blank'>点击输入验证码</a>";
+        } else {
+          resultStr += " <a href='/spider?clean=1'>立即更新</a>";
         }
       }
       $("#status").html(updateDate + " 更新 " + resultStr);

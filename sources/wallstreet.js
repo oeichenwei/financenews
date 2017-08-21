@@ -68,7 +68,7 @@
 
   function WallStreetSource(db, cacheFolder) {
     util.mkdirpSync(path.join("caches", "wallstreet"));
-    var homeUrl = "https://api-prod.wallstreetcn.com/apiv1/content/articles?platform=wscn-platform&category=us&limit=2"
+    var homeUrl = "https://api-prod.wallstreetcn.com/apiv1/content/articles?platform=wscn-platform&category=global&limit=2"
     var homePath = path.join(cacheFolder, "wallstreet.json")
 
     return db.getLastUpdatedDate("wallstreet").then((lastdate) => parseWallStreetData(homeUrl, homePath, lastdate)).then(

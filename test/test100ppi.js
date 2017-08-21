@@ -17,8 +17,8 @@ describe('test 100ppi', function() {
     var id = (url.parse(uri).pathname.split("/")).slice(-1)[0];
     assert.equal(id, "detail-20170714-1095430.html");
 
-    var dateText = "2017年07月13日 09:59";
-    assert.equal(util.parseChineseDate(dateText), Date.parse("2017-07-13 09:59:00"));
+    var dateText = "2017年08月19日 17:22";
+    assert.equal(util.parseChineseDate(dateText), Date.parse("2017-08-19 17:22:00"));
 
     return Get100ppiSource(db, cacheFolder, "dianshi").then(console.log, function(err) {
       console.error(err);

@@ -36,6 +36,10 @@
       var nbsp = String.fromCharCode(160);
       var ndInfo = titleBar.text().trim().split(nbsp);
       ndInfo = ndInfo.filter(function(e){return e});
+      if (ndInfo.length < 3) {
+        console.error("Save100PPIArticle, ndInfo=", ndInfo);
+        return "";
+      }
       article["recvDate"] = util.parseChineseDate(ndInfo[1]);
       article["author"] = ndInfo[2];
       article["content"] = content.html();
