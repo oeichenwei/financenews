@@ -10,7 +10,7 @@
       let url = "http://weixin.sogou.com/weixin?type=1&s_from=input&ie=utf8&_sug_=n&_sug_type_=&query=" + id
       let searchPath = path.join(cacheFolder, "search_" + id + ".html")
       return util.downloadUrlWeixin(url, searchPath, "utf-8", to).then(util.parseHTML).then(function(window) {
-        let theLink = window.$("div[class='txt-box']").children("p").children("a")
+        let theLink = window.$("a[uigs='account_name_0']")
         let retLink = theLink.attr("href");
         if (!retLink) {
           fs.unlinkSync(searchPath);

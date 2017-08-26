@@ -53,11 +53,18 @@ var spiderJob = function(cleanOld) {
 
 var job = function() {
   //spiderJob(true);
+  if (!util.lastRun["date"]) {
+    console.log("cron job cancelled due to update in-progress.", new Date());
+    return
+  }
+  var dayOfYear = theDate.getDOY().toString();
+  var cacheFolder = path.join("caches", theDate.getFullYear().toString(), dayOfYear, "live");
+  util.deleteFolderRecursive(cacheFolder);
+  crawler.updateLive(theDate);
 }
 
 var rule = new schedule.RecurrenceRule();
-rule.hour = [8, 12, 20];
-rule.minute = 0;
+rule.minute = new schedule.Range(0, 59, 10);
 schedule.scheduleJob(rule, job);
 
 if (!args.skip) {

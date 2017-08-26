@@ -20,6 +20,8 @@
   var WeixinSource = require("./sources/weixin.js")
   var Get100ppiSource = require("./sources/100ppi.js")
   var GetChinaCefNews = require("./sources/chinacef.js")
+  var WallStreetSourceLive = require("./sources/wallstreet-live.js")
+
   var Q = require('q');
 
   function FinanceNewsCrawl() {
@@ -78,15 +80,34 @@
     util.lastRun = {startedate: theDate.getTime(), details: {}};
     var dayOfYear = theDate.getDOY().toString();
     this.cacheFolder = path.join("caches", theDate.getFullYear().toString(), dayOfYear);
+    this.cacheFolderLive  = path.join(this.cacheFolder, "live");
     var _this = this;
     util.mkdirpSync(this.cacheFolder);
+    util.mkdirpSync(this.cacheFolderLive);
     this.db.createIndex()
         .then(() => WallStreetSource(_this.db, _this.cacheFolder))
+        .then(() => WallStreetSourceLive(_this.db, _this.cacheFolderLive))
         .then(() => GetChinaCefNews(_this.db, _this.cacheFolder))
-        .then(() => _this.All100ppiSources())
         .then(() => _this.AllWeixinAccounts())
+        .then(() => _this.All100ppiSources())
         .then(successJob, failedJob);
   }
+
+  FinanceNewsCrawl.prototype.updateLive = function(theDate) {
+    if (!theDate) {
+      theDate = new Date();
+    }
+    util.lastRun = {startedate: theDate.getTime(), details: {}};
+    var dayOfYear = theDate.getDOY().toString();
+    this.cacheFolder = path.join("caches", theDate.getFullYear().toString(), dayOfYear);
+    this.cacheFolderLive  = path.join(this.cacheFolder, "live");
+    var _this = this;
+    util.mkdirpSync(this.cacheFolder);
+    util.mkdirpSync(this.cacheFolderLive);
+    this.db.createIndex()
+        .then(() => WallStreetSourceLive(_this.db, _this.cacheFolderLive));
+  }
+
   if (typeof window !== 'undefined') {
     window.FinanceNewsCrawl = FinanceNewsCrawl;
   }

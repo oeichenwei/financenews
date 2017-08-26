@@ -86,7 +86,7 @@ function markArticle(uri, recvDate, score) {
           var negativeBtn = '<button class="btn btn-primary" onclick="markArticle(\'' + url + '\',' + doc["recvDate"] + ', -1)">负面</button>';
           var row = $([
             '<div class="blog-post" id="' + aId + '">',
-            '  <h2 class="blog-post-title">' + doc["title"] + score + '</h2>',
+            doc["title"] ? ('  <h2 class="blog-post-title">' + doc["title"] + score + '</h2>') : "",
             '  <p class="blog-post-meta">' + displayDate + ' by ' + author + ' from ' + doc["sourceId"] + ' <a target="_blank" href="' + url + '">original link</a> ' + hideButton + '</p>',
             '  <p>' + contentHtml + '</p>',
             '  <p align="center"> ' + positiveBtn + '&nbsp;&nbsp;' + negativeBtn + '<br><br><br></p>',

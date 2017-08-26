@@ -182,6 +182,7 @@
 
   var allSources = {
     "wallstreet": {type: "wallstreet", category: "general", name: "华尔街"},
+    "wallstreetlive": {type: "wallstreetlive", category: "live", name: "华尔街快讯"},
     "chinacef" : {type: "chinacef", category: "general", name: "中国首席经济学家论坛"},
     "cn-finance": {type: "weixin", category: "general", name: "中国金融杂志"},
     "haiqing_FICC": {type: "weixin", category: "general", name: "海清FICC频道"},
@@ -214,7 +215,7 @@
     "erds4888": {type: "weixin", category: "future", name: "亚太地区煤炭交易中心"},
     "ydqhjy": {type: "weixin", category: "future", name: "一德菁英汇"},
     "zsqhyjs": {type: "weixin", category: "future", name: "招商期货研究所"},
-    "zslsd_": {type: "weixin", category: "future", name: "找塑料视点"},
+    "zsl2405": {type: "weixin", category: "future", name: "找塑料视点"},
     "cncotton": {type: "weixin", category: "future", name: "中储棉花信息中心"},
     "CISA_chinaisa": {type: "weixin", category: "future", name: "中国钢铁工业协会"},
     "CCAON-lvjian": {type: "weixin", category: "future", name: "中国氯碱网"},
