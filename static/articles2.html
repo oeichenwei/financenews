@@ -102,9 +102,9 @@ function markArticle(uri, recvDate, score) {
           var row = $([
             '<div class="blog-post" id="' + aId + '">',
             doc["title"] ? ('  <h2 class="blog-post-title">' + doc["title"] + score + '</h2>') : "",
-            '  <p class="blog-post-meta">' + displayDate + ' by ' + author + ' from ' + doc["sourceId"] + ' <a target="_blank" href="' + url + '">original link</a> ' + tags + hideButton + '</p>',
+            author ? ('  <p class="blog-post-meta">' + displayDate + ' by ' + author + ' from ' + doc["sourceId"] + ' <a target="_blank" href="' + url + '">original link</a> ' + tags + hideButton + '</p>') : ("[" + displayDate + "] " + tags),
             '  <p>' + contentHtml + '</p>',
-            '  <p align="center"> ' + positiveBtn + '&nbsp;&nbsp;' + negativeBtn + '<br><br><br></p>',
+            '  <p align="center"> ' + positiveBtn + '&nbsp;&nbsp;' + negativeBtn + (author ? '<br><br><br></p>': ''),
             '</div><!-- /.blog-post -->'
             ].join("\n"));
           $("#articles").append(row);

@@ -45,6 +45,11 @@
       }
       var collection = db.collection('articles');
       doc["category"] = util.getCategory(doc["sourceId"]);
+      var nowTime = (new Date()).getTime();
+      if (doc["recvDate"] > nowTime) {
+        console.log("StockNewsDB.saveDoc correct the wrong recvDate to current date.", doc["recvDate"], nowTime);
+        doc["recvDate"] = nowTime;
+      }
       //console.info("saveDoc", doc);
       var key = {recvDate : doc["recvDate"], uri: doc["uri"]}
       let value = Object.assign({}, doc);

@@ -15,6 +15,7 @@
         var articles = articleListJson["data"]["items"];
         var done = false
         for (var i in articles) {
+          //console.log("parseWallStreetData -- ", articles[i]["display_time"]*1000, lastdate)
           if(articles[i]["display_time"]*1000 <= lastdate) {
             done = true
           }
