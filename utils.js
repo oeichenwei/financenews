@@ -164,7 +164,7 @@
         files.forEach(function(file,index) {
             var curPath = path + "/" + file;
             if(fs.lstatSync(curPath).isDirectory()) { // recurse
-                deleteFolderRecursive(curPath);
+                CrawlUtil.deleteFolderRecursive(curPath);
             } else { // delete file
                 fs.unlinkSync(curPath);
             }

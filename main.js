@@ -53,10 +53,11 @@ var spiderJob = function(cleanOld) {
 
 var job = function() {
   //spiderJob(true);
-  if (!util.lastRun["date"]) {
+  if (util.lastRun && !util.lastRun["date"]) {
     console.log("cron job cancelled due to update in-progress.", new Date());
     return
   }
+  var theDate = new Date();
   var dayOfYear = theDate.getDOY().toString();
   var cacheFolder = path.join("caches", theDate.getFullYear().toString(), dayOfYear, "live");
   util.deleteFolderRecursive(cacheFolder);

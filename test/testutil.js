@@ -1,5 +1,6 @@
 var util = require('../utils.js');
 var assert = require('assert');
+var path = require('path');
 
 describe('Util', function() {
   describe('category', function() {
@@ -35,6 +36,12 @@ describe('Util', function() {
       let url = "http://images.csdn.net/20170714/%E6%BC%86%E8%BF%9C_meitu_1.jpg";
       util.safeUnlinkFile("./test/test.jpg");
       return util.downloadUrlWeixin(url, "./test/test.jpg", "binary", 10).then(() => {util.safeUnlinkFile("./test/test.jpg");});
+    });
+
+    it('check delete folder12345 recursively', function() {
+      let testFolder = path.join("caches", "testfolder", "live");
+      util.mkdirpSync(testFolder);
+      util.deleteFolderRecursive( path.join("caches", "testfolder"));
     });
   });
 });
