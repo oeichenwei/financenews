@@ -143,7 +143,7 @@
 
   function HandleErrorCode(error) {
     if (!(error instanceof Error)) {
-      return "need not to do authentication";
+      return new Error("need not to do authentication");
     }
     if (error.message === "search need authentication") {
       return GetSougouVerifyCode();

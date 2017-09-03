@@ -147,13 +147,19 @@
 
   app.get('/verify', function (req, res) {
     util.VerifyWeixinCode().then(function(aa) {
-      var result;
-      if (util.sogouChallenge) {
-        result = fs.readFileSync("./static/do_verify_sogou.html", "utf-8");
-      } else {
-        result = fs.readFileSync("./static/do_verify.html", "utf-8");
+      if (aa instanceof Error) {
+        console.log(aa);
+        res.redirect('/spider');
       }
-      res.send(result);
+      else {
+        var result;
+        if (util.sogouChallenge) {
+          result = fs.readFileSync("./static/do_verify_sogou.html", "utf-8");
+        } else {
+          result = fs.readFileSync("./static/do_verify.html", "utf-8");
+        }
+        res.send(result);
+      }
     });
   });
 
