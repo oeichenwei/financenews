@@ -120,6 +120,31 @@
     return deferred.promise;
   }
 
+  StockNewsDB.prototype.findRecentDocsCallback = function(days, okcb, errcb) {
+    if (!days) {
+      days = 1;
+    }
+    var _this = this;
+    MongoClient.connect(this.dburl, function(err, db) {
+      if (err) {
+        errcb(err);
+        return;
+      }
+      console.log("Connected correctly to server for findRecentDocsCallback days=", days);
+      var sinceDate = (new Date()).getTime() - days * 24 * 3600000;
+      var queryCondition = {"recvDate": { $gt: sinceDate }};
+      db.collection('articles').find(queryCondition).forEach(function(doc) {
+        if (doc) {
+          okcb(doc);
+        }
+      }, function(err) {
+        db.close();
+        errcb(err);
+        //console.log("findRecentDocsCallback done");
+      });
+    });
+  }
+
   StockNewsDB.prototype.getLastUpdatedDate = function(sourceId) {
     var deferred = Q.defer();
     MongoClient.connect(this.dburl, function(err, db) {

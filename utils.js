@@ -32,6 +32,11 @@
       return (mn + 1).toString() + "-" + dn.toString();
   };
 
+  CrawlUtil.fitDateToDay = function(time) {
+    var theDate = new Date(time);
+    return (new Date(theDate.getFullYear(), theDate.getMonth(), theDate.getDate(), 0, 0, 0)).getTime();
+  }
+
   function RequestWithRetry(url, options, maxRetries, callback) {
     request(url, options, function(error,response, body) {
       if (error || response.statusCode != 200) {

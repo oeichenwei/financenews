@@ -1,26 +1,57 @@
+var ArgumentParser = require('argparse').ArgumentParser;
+var parser = new ArgumentParser({
+  version: '0.0.1',
+  addHelp:true,
+  description: 'Update the financial news with rating'
+});
+
+parser.addArgument(
+  [ '-d', '--days' ],
+  {
+    action: "store",
+    type: 'int',
+    defaultValue: 1,
+    help: 'update how many days records'
+  }
+);
+
+parser.addArgument(
+  [ '-t', '--test' ],
+  {
+    action: "storeTrue",
+    defaultValue: false,
+    help: 'test update, it will always update recent 10 records'
+  }
+);
+
+parser.addArgument(
+  [ '-k', '--kind' ],
+  {
+    action: "store",
+    help: 'what kind of algorithm'
+  }
+);
+
+var args = parser.parseArgs()
 var StockNewsDB = require("./stocknewsdb.js")
-var allSources = ["wallstreet", "cn-finance", "haiqing_FICC", "jrhycom",
-      "cebmmacro",  "CEBM_research", "zepinghongguan", "CHINAFINANCE40FORUM",
-      "cfn-china", "FN_FinancialNews", "midou888_zx"];
-var Q = require('q');
+var CustomRating = require("./tagging/customrating.js")
+var path = require('path');
 
-function updateExistingRecords(){
-  var result = Q();
-  var db = new StockNewsDB();
-  allSources.forEach(function (f) {
-    result = result.then(() => db.updateCategory(f));
-  });
-  return result;
-}
-
-//updateExistingRecords().then(console.log, console.error);
-
+var db = new StockNewsDB();
 function updateSimpleRating(days) {
-  var db = new StockNewsDB();
   db.findRecentUnratedDocs(days, true).then((docs) =>{
     console.log("findRecentUnratedDocs, length=", docs.length);
     db.resaveDocRecursively(docs);
   }).then(console.log, console.error);
 }
 
-updateSimpleRating(1);
+if (args.kind == "simple") {
+  updateSimpleRating(args.days);
+} else {
+  var customRating = new CustomRating();
+
+  var theDate = new Date();
+  var dayOfYear = theDate.getDOY().toString();
+  var outputFile = path.join("caches", "customrate_" + theDate.getFullYear().toString() + "_" + dayOfYear + ".json");
+  customRating.run(args.days, db, outputFile);
+}

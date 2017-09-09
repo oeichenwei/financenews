@@ -43,5 +43,13 @@ describe('Util', function() {
       util.mkdirpSync(testFolder);
       util.deleteFolderRecursive( path.join("caches", "testfolder"));
     });
+
+    it('check fitdate', function() {
+      var nowDate = 1504972679480;
+      console.log((new Date(nowDate)).toLocaleDateString() + " " + (new Date(nowDate)).toLocaleTimeString());
+      var fitDate = util.fitDateToDay(nowDate);
+      console.log((new Date(fitDate)).toLocaleDateString() + " "  + (new Date(fitDate)).toLocaleTimeString());
+      assert.equal(fitDate, 1504886400000);
+    });
   });
 });
