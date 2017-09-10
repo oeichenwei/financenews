@@ -42,6 +42,10 @@
   CustomRating.prototype.calculateDailyResult = function(outputFile) {
     //loop for each day
     var result = {};
+    if (outputFile && fs.existsSync(outputFile)) {
+      var historyResult = fs.readFileSync(outputFile);
+      result = JSON.parse(historyResult);
+    }
     for(var key in this.dailyBuckets) {
       var values = this.dailyBuckets[key];
       var posVal = 0;

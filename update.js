@@ -52,6 +52,6 @@ if (args.kind == "simple") {
 
   var theDate = new Date();
   var dayOfYear = theDate.getDOY().toString();
-  var outputFile = path.join("caches", "customrate_" + theDate.getFullYear().toString() + "_" + dayOfYear + ".json");
+  var outputFile = path.join("caches", "customrate_result.json");
   customRating.run(args.days, db, outputFile);
 }
