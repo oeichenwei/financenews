@@ -174,6 +174,36 @@
     db.updateScore(req.query.uri, parseInt(req.query.recvDate), parseInt(req.query.score)).then((result) => res.send(result));
   });
 
+  app.get('/customrate', function (req, res) {
+    console.log("customrate");
+    var recentresult = JSON.parse(fs.readFileSync("./caches/customrate_result.json"));
+    var forDisplay = {}
+    var firstDate = -1;
+    for (var theDate in recentresult) {
+      var now = Date.parse(theDate);
+      if (firstDate < 0 || now < firstDate) {
+        firstDate = now;
+      }
+    }
+    var theDate = new Date();
+    var today = (new Date(theDate.getFullYear(), theDate.getMonth(), theDate.getDate(), 0, 0, 0)).getTime();
+    var count = (today - firstDate) / (24*3600000);
+
+    forDisplay["firstDate"] = firstDate / 1000;
+    forDisplay["days"] = count;
+    forDisplay["data"] = [];
+
+    for (var i = firstDate; i <= today; i += (24*3600000)) {
+      var readableKey = (new Date(i)).toLocaleDateString();
+      var sense = 0;
+      if (recentresult[readableKey]) {
+        sense = Math.round(recentresult[readableKey].sense * 1000);
+      }
+      forDisplay["data"].push(sense);
+    }
+    res.send(forDisplay);
+  });
+
   function WebRender() {
   }
 
