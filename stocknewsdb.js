@@ -133,7 +133,7 @@
       console.log("Connected correctly to server for findRecentDocsCallback days=", days);
 	    var theDate = new Date();
       var sinceDate = (new Date(theDate.getFullYear(), theDate.getMonth(), theDate.getDate(), 0, 0, 0)).getTime() - days * 24 * 3600000;
-      var queryCondition = {"recvDate": { $gt: sinceDate }};
+      var queryCondition = {"recvDate": { $gte: sinceDate }};
       db.collection('articles').find(queryCondition).forEach(function(doc) {
         if (doc) {
           okcb(doc);
