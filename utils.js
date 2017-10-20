@@ -197,7 +197,7 @@
     "zepinghongguan": {type: "weixin", category: "general", name: "泽平宏观"},
     "CHINAFINANCE40FORUM": {type: "weixin", category: "general", name: "中国金融四十人论坛"},
     "cfn-china": {type: "weixin", category: "general", name: "中国金融网"},
-    "FN_FinancialNews": {type: "weixin", category: "general", name: "中国金融新闻网"},
+    //"FN_FinancialNews": {type: "weixin", category: "general", name: "中国金融新闻网"},
     "midou888_zx": {type: "weixin", category: "future", name: "米斗资讯"},
     "qihuozhoukan": {type: "weixin", category: "future", name: " 大宗内参"},
     "gh_ae0f6dacaf22": {type: "weixin", category: "future", name: "东证衍生品研究院"},

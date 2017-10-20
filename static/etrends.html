@@ -21,6 +21,9 @@
       var days = inputdata["days"];
       for (var i = 0; i < days; i++) {
         var now = new Date(beginDate + i * 24* 3600000);
+				if (now.getDay() == 0 || now.getDay() == 6) {
+					continue;
+				}
         date.push([now.getFullYear(), now.getMonth() + 1, now.getDate()].join('/'));
         data.push(inputdata["data"][i] / 1000.0);
       }
@@ -59,7 +62,7 @@
         },
         yAxis: {
             type: 'value',
-            boundaryGap: [0, '100%']
+            boundaryGap: [0, 0]
         },
         dataZoom: [{
             type: 'inside',
