@@ -63,7 +63,16 @@
   function successJob(result) {
     util.lastRun["date"] = (new Date()).getTime();
     util.lastRun["result"] = true;
-    console.log(result);
+    console.log("successJob - ", result);
+
+    var CustomRating = require("./tagging/customrating.js")
+    var customRating = new CustomRating();
+
+    var theDate = new Date();
+    var dayOfYear = theDate.getDOY().toString();
+    var outputFile = path.join("caches", "customrate_result.json");
+    console.log("custom rating running...");
+    customRating.run(1, new StockNewsDB(), outputFile);
   }
 
   function failedJob(err) {
