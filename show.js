@@ -188,6 +188,11 @@
     var theDate = new Date();
     var today = (new Date(theDate.getFullYear(), theDate.getMonth(), theDate.getDate(), 0, 0, 0)).getTime();
     var count = (today - firstDate) / (24*3600000);
+	if(theDate.getHours() >= 17)
+	{
+		count = count + 1;
+		today = today + 24*3600000;
+	}
 
     forDisplay["firstDate"] = firstDate / 1000;
     forDisplay["days"] = count;

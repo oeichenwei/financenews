@@ -63,16 +63,16 @@
   function successJob(result) {
     util.lastRun["date"] = (new Date()).getTime();
     util.lastRun["result"] = true;
-    console.log("successJob - ", result);
-
+    console.log("successJob", result);
+	
     var CustomRating = require("./tagging/customrating.js")
     var customRating = new CustomRating();
 
     var theDate = new Date();
     var dayOfYear = theDate.getDOY().toString();
     var outputFile = path.join("caches", "customrate_result.json");
-    console.log("custom rating running...");
-    customRating.run(1, new StockNewsDB(), outputFile);
+	console.log("custom rating running...");
+    customRating.run(3, new StockNewsDB(), outputFile);
   }
 
   function failedJob(err) {
@@ -97,8 +97,8 @@
         .then(() => WallStreetSource(_this.db, _this.cacheFolder))
         .then(() => WallStreetSourceLive(_this.db, _this.cacheFolderLive))
         .then(() => GetChinaCefNews(_this.db, _this.cacheFolder))
-        .then(() => _this.AllWeixinAccounts())
         .then(() => _this.All100ppiSources())
+        .then(() => _this.AllWeixinAccounts())
         .then(successJob, failedJob);
   }
 

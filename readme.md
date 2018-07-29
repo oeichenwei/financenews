@@ -28,3 +28,9 @@
 ```
 mongod --logpath "C:\financenews\mongodb\logs\logs.txt" --logappend --dbpath "C:\financenews\mongodb\data" --directoryperdb --serviceName "MongoDB" --serviceDisplayName "MongoDB" --install
 ```
+
+4.启动程序
+在命令行切换到目录`C:\financenews\crawler`，执行命令`npm start`                  或 'node main.js'
+
+5.计算不同的Score
+输出文件不同，不同的关键词，算法可能会有不同，即rateArticle3函数会有多个。曲线有多个链接，比如当前是商品，后续会加一个资金政策。customrating有没有继承，我可以比较方便的增加子类，然后修改关键词，修改rateArticle3

@@ -15,13 +15,13 @@
         var articles = articleListJson["data"]["items"];
         var done = false
         for (var i in articles) {
-          //console.log("parseWallStreetData -- ", articles[i]["display_time"]*1000, lastdate)
+          console.log("parseWallStreetData -- ", articles[i]["display_time"]*1000, lastdate)
           if(articles[i]["display_time"]*1000 <= lastdate) {
             done = true
           }
           total.push(articles[i])
         }
-        if (done) {
+        if (done || recursiveNum > 20) {
           deferred.resolve(total)
         } else {
           var newUrl = "https://api-prod.wallstreetcn.com/apiv1/content/articles?category=global&limit=20&platform=wscn-platform&cursor="
