@@ -57,13 +57,20 @@
       cb(undefined, fs.readFileSync(filepath, encoding));//"utf-8"
       return;
     }
-    console.log("downloading " + url + "...");
-    var options =  {timeout: 15000, gzip: willZip};
+    console.log("downloading " + url + " ...");
+    var options =  {timeout: 15000, gzip: willZip, forever: true,
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language': 'zh-cn'
+      }
+    };
     if (encoding == "binary") {
       options["encoding"] = 'binary';
     }
+
     options["jar"] = CrawlUtil.cookie;
-    //console.log("using cookie: ", CrawlUtil.cookie.getCookieString(url));
+    console.log("using cookie: ", CrawlUtil.cookie.getCookieString(url));
     RequestWithRetry(url, options, 5, function (error, response, body) {
       if (error || response.statusCode != 200) {
         console.log("  error on downloading url:" + url);
@@ -78,6 +85,7 @@
       if (filepath) {
         fs.writeFileSync(filepath, body, encoding); //"utf-8"
       }
+      //console.log(response.request)
       console.log("  done url:", url);
       cb(undefined, body);
     });
@@ -137,6 +145,10 @@
   CrawlUtil.parseHTMLCallback = function(body, callback) {
     jsdom.env({
       html: body,
+//      features : {
+//        FetchExternalResources : ['script'],
+//        ProcessExternalResources : ['script']
+//      },
       src: [jquery],
       done: function (err, window) {
         callback(err, window);

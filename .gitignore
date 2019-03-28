@@ -4,3 +4,4 @@ caches
 static/auth.jpg
 *.docx
 static/sogou.jpg
+package-lock.json

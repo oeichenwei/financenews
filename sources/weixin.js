@@ -16,14 +16,36 @@
           fs.unlinkSync(searchPath);
           return new Error("search need authentication");
         }
-        return retLink;
+        return ResolveLink(retLink, cacheFolder, id, to);
       });
+  }
+
+  function ResolveLink(url, cacheFolder, id, to) {
+    if (url instanceof Error) {
+      return url;
+    }
+    url = "https://weixin.sogou.com" + url;
+    var b = Math.floor(100*Math.random())+1;
+    var a = url.indexOf("url=");
+    var c = url.indexOf("&k=");
+    
+    -1 !== a && -1 === c && (a = url.substr(a+4+b,1),url+="&k="+b+"&h="+a)
+    let resolvePath = path.join(cacheFolder, "resolve_" + id + ".html")
+    return util.downloadUrlWeixin(url, resolvePath, "utf-8", to).then(util.parseHTML).then(function(window) {
+      let theScripts = window.$("script")
+      let code = theScripts[0].text
+      code += "url;"
+      let retLink = eval(code)
+      console.log(retLink)
+      return retLink;
+    });
   }
 
   function ListRecentArticles(url, cacheFolder, id, to=1000) {
     if (url instanceof Error) {
       return url;
     }
+
     let listPath = path.join(cacheFolder, "list_" + id + ".html");
     let searchPath = path.join(cacheFolder, "search_" + id + ".html")
     return util.downloadUrlWeixin(url, listPath, "utf-8", to).then(util.parseHTML).then(function(window) {
@@ -81,6 +103,7 @@
     } else {
       url = "http://mp.weixin.qq.com" + article["content_url"].replace(/&amp;/gi,"&");
     }
+
     if (article["fileid"] == 0) {
       article["fileid"] = hashCode(article["content_url"]);
     }
